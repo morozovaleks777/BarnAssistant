@@ -1,0 +1,34 @@
+package com.example.barnassistant.domain.repository
+
+
+import com.example.barnassistant.data.DataOrException
+import com.example.barnassistant.domain.model.BarnItem
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+
+class FireRepository @Inject constructor(
+    private val queryBook: Query
+    ) {
+    suspend fun getAllBooksFromDatabase(): DataOrException<List<BarnItem>, Boolean, Exception> {
+        val dataOrException = DataOrException<List<BarnItem>, Boolean, Exception>()
+
+        try {
+            dataOrException.loading = true
+            dataOrException.data =  queryBook.get().await().documents.map { documentSnapshot ->
+                documentSnapshot.toObject(BarnItem::class.java)!!
+            }
+            if (!dataOrException.data.isNullOrEmpty()) dataOrException.loading = false
+
+
+        }catch (exception: FirebaseFirestoreException){
+            dataOrException.e = exception
+        }
+        return dataOrException
+
+    }
+
+
+
+}

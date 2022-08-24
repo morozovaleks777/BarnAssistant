@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "207748036218",
+    "project_id": "barn-assistant-8d189",
+    "storage_bucket": "barn-assistant-8d189.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207748036218:android:8ea29d2744af8740766dc3",
+        "android_client_info": {
+          "package_name": "com.example.barnassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207748036218-7tcnhkpmj0oj688sdcoefg7qfr2vgkqp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf5CinfyghzRya36inLXJQChmenuhOJNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207748036218-7tcnhkpmj0oj688sdcoefg7qfr2vgkqp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
