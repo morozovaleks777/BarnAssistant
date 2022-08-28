@@ -3,6 +3,7 @@ package com.example.barnassistant.data.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.model.NameBarnItemList
 
 //@Database(entities = [BarnItemDB::class],version = 1,exportSchema = false)
 //abstract class AppRoomDatabase:RoomDatabase() {
@@ -33,7 +34,7 @@ import com.example.barnassistant.domain.model.BarnItemDB
 //    }
 //}
 
-@Database(entities = [BarnItemDB::class],version = 1,exportSchema = false)
+@Database(entities = [BarnItemDB::class,NameBarnItemList::class],version = 5,exportSchema = false)
 abstract class AppRoomDatabase:RoomDatabase() {
     abstract fun barnListDao():RoomDao
 }

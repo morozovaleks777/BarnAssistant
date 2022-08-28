@@ -43,7 +43,7 @@ class BarnItemViewModel @Inject constructor(
 
 
     val barnItem = MutableStateFlow<BarnItemDB>(BarnItemDB(name = "", count = 0f))
-
+var currentListName = "no open lists"
 
     private val _closeScreen=MutableLiveData<Unit>()
     val closeScreen: LiveData<Unit>
@@ -99,9 +99,10 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
         val fieldsValid = validateInput(name, count,price)
 //        if (fieldsValid) {
             viewModelScope.launch {
-            val barnItem = BarnItem(name=name, count=count, price = price, enabled = true,listName= listName)
+            val barnItem = BarnItem(name=name, count=count, price = price, enabled = true,listName= listName,)
 
                 addBarnItemUseCase.addBarnItem(barnItem)
+
             }
             finishWork()
        // }

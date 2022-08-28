@@ -2,14 +2,23 @@ package com.example.barnassistant.data.room
 
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.example.barnassistant.data.BarnListMapper
+import com.example.barnassistant.data.DataOrException
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.domain.repository.RoomRepository
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -48,10 +57,11 @@ class RoomRepositoryImpl @Inject constructor (
         return barnItemDB
     }
 
-    override fun getBarnList(): LiveData<List<BarnItem>> =
-        Transformations.map(barnListDao.getBarnItemList()) {
-            mapper.mapListBarnItemDBToListBarnItem(it)
-        }
+    override fun getBarnList(): LiveData<List<BarnItemDB>> =barnListDao.getBarnItemList()
+//        Transformations.map(barnListDao.getBarnItemList()) {
+//            mapper.mapListBarnItemDBToListBarnItem(it)
+//            barnListDao.getBarnItemList().value
+//        }
 fun getFavorites(): Flow<List<BarnItemDB>> = barnListDao.getBarnList()
 
     override suspend fun addBarnItem(barnItem: BarnItem) {
@@ -77,4 +87,67 @@ fun getFavorites(): Flow<List<BarnItemDB>> = barnListDao.getBarnList()
             return "$timeText \n $dateText"
         }
     }
+
+    override suspend fun addName(nameBarnItemList: NameBarnItemList) {
+        barnListDao.addNameBarnItemList(nameBarnItemList)
+    }
+
+
+//    override suspend  fun< T> getAllNameBarnItemListFromDatabase(): DataOrException<List< T>, Boolean, Exception> {
+//
+//            val dataOrException = DataOrException<List<T>, Boolean, Exception>()
+//
+//            try {
+//                dataOrException.loading = true
+//                when(dataOrException){
+//                  dataOrException as  DataOrException<List<NameBarnItemList>, Boolean, Exception> -> {
+//                        dataOrException.data =  barnListDao.getNameBarnItemListList().value
+//                        if (!dataOrException.data.isNullOrEmpty()) dataOrException.loading = false
+//                    }
+//                }
+//
+//            }catch (exception: FirebaseFirestoreException){
+//                dataOrException.e = exception
+//            }
+//            return dataOrException
+//
+//        }
+
+   suspend  fun getAllNameBarnItemListFromDatabase2(): DataOrException<LiveData<List<NameBarnItemList>>, Boolean, Exception> {
+
+        val dataOrException = DataOrException<LiveData<List<NameBarnItemList>>, Boolean, Exception>()
+
+        try {
+            dataOrException.loading = true
+
+                    dataOrException.data =  barnListDao.getNameBarnItemListList()
+                  //  if (!dataOrException.data.isNullOrEmpty()) dataOrException.loading = false
+
+
+
+        }catch (exception: FirebaseFirestoreException){
+            dataOrException.e = exception
+        }
+        return dataOrException
+
+    }
+
+  override  fun getList():Flow<List<NameBarnItemList>> =barnListDao.getList()
+    override suspend fun getBarnItemName(nameBarnItemList: NameBarnItemList): NameBarnItemList {
+     return barnListDao.getNameBarnItemList(nameBarnItemList.itemId)
+    }
+
+    override suspend fun getBarnItemName(name: String): NameBarnItemList {
+        return barnListDao.getNameBarnItemListFromName(name)
+    }
+
+    override suspend fun getBarnItemNameFromName(name:String): NameBarnItemList {
+        return barnListDao.getNameBarnItemListFromName(name)
+    }
+
+    override suspend fun deleteNameBarnItem(nameBarnItemList: NameBarnItemList) {
+        barnListDao.deleteNameBarnItemList(nameBarnItemList.itemId)
+    }
+
+
 }

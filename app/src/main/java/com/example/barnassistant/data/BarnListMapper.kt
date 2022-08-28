@@ -12,7 +12,8 @@ return BarnItemDB(
     count = barnItem.count,
     price = barnItem.price,
     enabled = barnItem.enabled,
-    listName = barnItem.listName
+    listName = barnItem.listName,
+    time = barnItem.time
 )
     }
 
@@ -23,7 +24,8 @@ return BarnItemDB(
             count = barnItemDB.count,
             price = barnItemDB.price,
             enabled = barnItemDB.enabled,
-            listName = barnItemDB.listName
+            listName = barnItemDB.listName,
+            time = barnItemDB.time
         )
     }
 

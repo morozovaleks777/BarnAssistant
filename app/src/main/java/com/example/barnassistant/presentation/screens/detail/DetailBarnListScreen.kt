@@ -32,10 +32,12 @@ import androidx.navigation.NavHostController
 import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.components.InputField
 import com.example.barnassistant.presentation.components.NoteRow
 import com.example.barnassistant.presentation.navigation.AppScreens
+import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -43,6 +45,7 @@ import com.example.barnassistant.presentation.navigation.AppScreens
 fun DetailBarnListScreen(
     navController: NavHostController,
     viewModel: BarnItemViewModel = hiltViewModel(),
+    homeViewModel: HomeScreenViewModel= hiltViewModel()
 ) {
     val listName = rememberSaveable { mutableStateOf("") }
     val name = rememberSaveable { mutableStateOf("") }
@@ -66,6 +69,7 @@ fun DetailBarnListScreen(
         Surface {
             Column {
                 EditForm(
+                    homeViewModel,
                     itemId,
                     listName,
                     name,
@@ -196,6 +200,7 @@ fun DetailBarnListScreen(
 @ExperimentalComposeUiApi
 @Composable
 fun EditForm(
+    homeViewModel: HomeScreenViewModel,
     itemId: MutableState<Int>,
     listName: MutableState<String>,
     name: MutableState<String>,
@@ -216,7 +221,7 @@ fun EditForm(
                 && count.value.trim().isNotEmpty()
                 && price.value.trim().isNotEmpty()
     }
-     modifier
+    modifier
         .background(MaterialTheme.colors.background)
         .verticalScroll(rememberScrollState())
 
@@ -297,6 +302,8 @@ fun EditForm(
                         name.value, count.value,
                         price.value, listName.value
                     )
+                    viewModel.currentListName=listName.value
+                    homeViewModel.addNameBarnItemList(NameBarnItemList(name = listName.value, createdTime = "Time :"))
                     Log.d("test", "EditForm: $list")
                 }
                 else -> {
@@ -307,9 +314,10 @@ fun EditForm(
                         inputListName = listName.value,
                         inputIteId = itemId.value
                     )
-
+                    viewModel.currentListName=listName.value
                     Log.d("test", "EditForm: viewModel.barnItem  ${viewModel.barnItem.value}")
                 }
+
             }
 
             onDone(listName.value.trim())

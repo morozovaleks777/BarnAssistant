@@ -21,7 +21,6 @@ import androidx.room.PrimaryKey
 //)
 @Entity(tableName = "barn_tbl")
 data class BarnItemDB (
-    @NonNull
     @ColumnInfo(name = "itemId")
     @PrimaryKey(autoGenerate = true)
     val itemId: Int=UNDEFINED_ID,
@@ -29,7 +28,8 @@ data class BarnItemDB (
     val count:Float,
     val price:Float=0.0F,
     var enabled:Boolean=true,
-    val listName:String=""
+    val listName:String="",
+    val time:String = ""
 
 ){
     companion object{

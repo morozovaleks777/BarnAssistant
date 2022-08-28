@@ -12,7 +12,8 @@ data class BarnItemFB(
     var count: Float,
     var price:Float=0.0F,
     var enabled:Boolean,
-    var listName:String
+    var listName:String,
+    var time:String=""
 ){
     companion object{
         const val UNDEFINED_ID=0

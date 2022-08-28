@@ -6,7 +6,8 @@ data class BarnItem(
     val count: Float,
     val price:Float=0.0F,
     val enabled:Boolean,
-    val listName:String
+    val listName:String,
+    val time:String = ""
 ){
     companion object{
         const val UNDEFINED_ID=0
