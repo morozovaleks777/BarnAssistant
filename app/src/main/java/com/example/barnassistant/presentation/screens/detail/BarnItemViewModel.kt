@@ -9,6 +9,7 @@ import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.data.room.RoomRepositoryImpl
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.repository.RoomRepository
 import com.example.barnassistant.domain.useCases.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +21,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BarnItemViewModel @Inject constructor(
-    val repository: RoomRepositoryImpl,
-                                            private val editBarnItemUseCase: EditBarnItemUseCase,
-                                            private val addBarnItemUseCase: AddBarnItemUseCase,
-                                            private val getBarnItemUseCase: GetBarnItemUseCase,
-                                            private val getBarnListUseCase: GetBarnListUseCase,
-                                            private val deleteBarnItemUseCase: DeleteBarnItemUseCase,
-                                            private val barnListMapper: BarnListMapper
+    val repository: RoomRepository,
+    private val editBarnItemUseCase: EditBarnItemUseCase,
+    private val addBarnItemUseCase: AddBarnItemUseCase,
+    private val getBarnItemUseCase: GetBarnItemUseCase,
+    private val getBarnListUseCase: GetBarnListUseCase,
+    private val deleteBarnItemUseCase: DeleteBarnItemUseCase,
+    private val barnListMapper: BarnListMapper
 ): ViewModel() {
 
 
@@ -64,7 +65,7 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
    init{
 
            viewModelScope.launch(Dispatchers.IO) {
-               repository.getFavorites().distinctUntilChanged()
+             getBarnListUseCase.getBarnList().distinctUntilChanged()
                    .collect {
                            listOfFavs ->
                        if(listOfFavs.isNullOrEmpty()){
@@ -78,6 +79,7 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
            }
 
 }
+
     fun getBarnItem(barnItemId:Int){
         viewModelScope.launch {
             val item = getBarnItemUseCase.getBarnItem(barnItemId)

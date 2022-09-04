@@ -35,6 +35,7 @@ import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.components.InputField
+import com.example.barnassistant.presentation.components.LazyColumnBarnItemDB
 import com.example.barnassistant.presentation.components.NoteRow
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
@@ -45,9 +46,10 @@ import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 fun DetailBarnListScreen(
     navController: NavHostController,
     viewModel: BarnItemViewModel = hiltViewModel(),
-    homeViewModel: HomeScreenViewModel= hiltViewModel()
+    homeViewModel: HomeScreenViewModel= hiltViewModel(),
+    curName:String=""
 ) {
-    val listName = rememberSaveable { mutableStateOf("") }
+    val listName = rememberSaveable { mutableStateOf(curName) }
     val name = rememberSaveable { mutableStateOf("") }
     val count = rememberSaveable { mutableStateOf("") }
     val price = rememberSaveable { mutableStateOf("") }
@@ -90,111 +92,134 @@ fun DetailBarnListScreen(
                 val listBarnItemDB = viewModel.favList.collectAsState().value.filter {
                     it.listName == listName.value
                 }
-                LazyColumn {
-                    items(items = listBarnItemDB) { it ->
 
-                        val barn = it
-                        var unread by remember { mutableStateOf(false) }
-                        val dismissState = rememberDismissState(
-                            confirmStateChange = {
-                                if (it == DismissValue.DismissedToEnd) {
-                                    unread = !unread
-                                }
-                                if (it == DismissValue.DismissedToStart) {
-                                    viewModel.removeItem(barn)
-
-
-                                }
-                                //  it != DismissValue.DismissedToEnd
-                                false
-
-                            }
-                        )
-                        SwipeToDismiss(
-                            state = dismissState,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            directions = setOf(
-                                DismissDirection.StartToEnd,
-                                DismissDirection.EndToStart
-                            ),
-                            dismissThresholds = { direction ->
-                                FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
-                            },
-                            background = {
-                                val direction =
-                                    dismissState.dismissDirection ?: return@SwipeToDismiss
-                                val color by animateColorAsState(
-                                    when (dismissState.targetValue) {
-                                        DismissValue.Default -> Color.Unspecified
-                                        DismissValue.DismissedToEnd -> Color.Green
-                                        DismissValue.DismissedToStart -> Color.Red
-                                    }
-                                )
-                                val alignment = when (direction) {
-                                    DismissDirection.StartToEnd -> Alignment.CenterStart
-                                    DismissDirection.EndToStart -> Alignment.CenterEnd
-                                }
-                                val icon = when (direction) {
-                                    DismissDirection.StartToEnd -> Icons.Default.Done
-                                    DismissDirection.EndToStart -> {
-                                        Icons.Default.Delete
-                                    }
-
-
-                                }
-                                val scale by animateFloatAsState(
-                                    if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
-                                )
-
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(horizontal = 20.dp),
-                                    contentAlignment = alignment
-                                ) {
-                                    Icon(
-                                        icon,
-                                        contentDescription = "Localized description",
-                                        modifier = Modifier.scale(scale)
-                                    )
-                                }
-                            },
-                            dismissContent = {
-
-                                NoteRow(
-                                    barnItem = BarnItemDB(
-                                        name = it.name,
-                                        count = it.count,
-                                        price = it.price,
-                                        itemId = it.itemId,
-                                        listName = it.listName
-
-                                    ),
-                                    name = it.name,
-                                    count = it.count.toString(),
-                                    price = it.price.toString(),
-                                    sum = viewModel.getItemSum(it),
-                                    stringSum = when (it.count <= 1) {
-                                        true -> ""
-                                        else -> "sum :"
-                                    }
-                                ) {
-                                    name.value = it.name
-                                    count.value = it.count.toString()
-                                    price.value = it.price.toString()
-                                    itemId.value = it.itemId
-                                    listName.value = it.listName
-                                    Log.d("test", "DetailBarnListScreen: $it ")
-
-                                }
-                            })
-                    }
-                }
+                LazyColumnBarnItemDB(
+                    listBarnItemDB,
+                    viewModel,
+                    name,
+                    count,
+                    price,
+                    itemId,
+                    listName
+                )
             }
         }
     }
 }
+
+//@ExperimentalMaterialApi
+//@Composable
+//private fun LazyColumnBarnItemDB(
+//    listBarnItemDB: List<BarnItemDB>,
+//    viewModel: BarnItemViewModel,
+//    name: MutableState<String>,
+//    count: MutableState<String>,
+//    price: MutableState<String>,
+//    itemId: MutableState<Int>,
+//    listName: MutableState<String>
+//) {
+//    LazyColumn {
+//        items(items = listBarnItemDB) { it ->
+//
+//            val barn = it
+//            var unread by remember { mutableStateOf(false) }
+//            val dismissState = rememberDismissState(
+//                confirmStateChange = {
+//                    if (it == DismissValue.DismissedToEnd) {
+//                        unread = !unread
+//                    }
+//                    if (it == DismissValue.DismissedToStart) {
+//                        viewModel.removeItem(barn)
+//
+//
+//                    }
+//                    //  it != DismissValue.DismissedToEnd
+//                    false
+//
+//                }
+//            )
+//            SwipeToDismiss(
+//                state = dismissState,
+//                modifier = Modifier.padding(vertical = 4.dp),
+//                directions = setOf(
+//                    DismissDirection.StartToEnd,
+//                    DismissDirection.EndToStart
+//                ),
+//                dismissThresholds = { direction ->
+//                    FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
+//                },
+//                background = {
+//                    val direction =
+//                        dismissState.dismissDirection ?: return@SwipeToDismiss
+//                    val color by animateColorAsState(
+//                        when (dismissState.targetValue) {
+//                            DismissValue.Default -> Color.Unspecified
+//                            DismissValue.DismissedToEnd -> Color.Green
+//                            DismissValue.DismissedToStart -> Color.Red
+//                        }
+//                    )
+//                    val alignment = when (direction) {
+//                        DismissDirection.StartToEnd -> Alignment.CenterStart
+//                        DismissDirection.EndToStart -> Alignment.CenterEnd
+//                    }
+//                    val icon = when (direction) {
+//                        DismissDirection.StartToEnd -> Icons.Default.Done
+//                        DismissDirection.EndToStart -> {
+//                            Icons.Default.Delete
+//                        }
+//
+//
+//                    }
+//                    val scale by animateFloatAsState(
+//                        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+//                    )
+//
+//                    Box(
+//                        Modifier
+//                            .fillMaxSize()
+//                            .background(color)
+//                            .padding(horizontal = 20.dp),
+//                        contentAlignment = alignment
+//                    ) {
+//                        Icon(
+//                            icon,
+//                            contentDescription = "Localized description",
+//                            modifier = Modifier.scale(scale)
+//                        )
+//                    }
+//                },
+//                dismissContent = {
+//
+//                    NoteRow(
+//                        barnItem = BarnItemDB(
+//                            name = it.name,
+//                            count = it.count,
+//                            price = it.price,
+//                            itemId = it.itemId,
+//                            listName = it.listName
+//
+//                        ),
+//                        name = it.name,
+//                        count = it.count.toString(),
+//                        price = it.price.toString(),
+//                        sum = viewModel.getItemSum(it),
+//                        stringSum = when (it.count <= 1) {
+//                            true -> ""
+//                            else -> "sum :"
+//                        }
+//                    ) {
+//                        name.value = it.name
+//                        count.value = it.count.toString()
+//                        price.value = it.price.toString()
+//                        itemId.value = it.itemId
+//                        listName.value = it.listName
+//                        Log.d("test", "DetailBarnListScreen: $it ")
+//
+//                    }
+//                })
+//        }
+//    }
+//}
 
 
 @ExperimentalComposeUiApi
@@ -213,7 +238,9 @@ fun EditForm(
     isCreateAccount: Boolean = false,
     onDone: (String) -> Unit = { }
 ) {
-
+val time= rememberSaveable {
+    mutableStateOf("")
+}
     val keyboardController = LocalSoftwareKeyboardController.current
     val valid = remember(listName.value, name.value, count.value, price.value) {
         listName.value.trim().isNotEmpty()
@@ -303,7 +330,12 @@ fun EditForm(
                         price.value, listName.value
                     )
                     viewModel.currentListName=listName.value
-                    homeViewModel.addNameBarnItemList(NameBarnItemList(name = listName.value, createdTime = "Time :"))
+                    Log.d("test", "EditForm:befor  ${time.value}")
+                    homeViewModel.getTime()
+                    time.value=homeViewModel.time.value
+                    Log.d("test", "EditForm: after ${time.value}")
+
+                    homeViewModel.addNameBarnItemList(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))
                     Log.d("test", "EditForm: $list")
                 }
                 else -> {

@@ -7,7 +7,5 @@ import javax.inject.Inject
 class AddBarnItemUseCase @Inject constructor (private  val barnListRepository: RoomRepository){
 
   suspend  fun addBarnItem(barnItem: BarnItem){
-      barnListRepository.
-      addBarnItem(barnItem )
-    }
+      barnListRepository.addBarnItem(barnItem ) }
 }

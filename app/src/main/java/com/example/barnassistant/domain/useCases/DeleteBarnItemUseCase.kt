@@ -9,4 +9,5 @@ class DeleteBarnItemUseCase @Inject constructor(private  val barnListRepository:
    suspend fun deleteBarnItem(barnItem: BarnItem){
 barnListRepository.deleteBarnItem(barnItem)
     }
+
 }

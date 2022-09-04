@@ -11,8 +11,8 @@ data class NameBarnItemList(
     @ColumnInfo(name = "itemId")
     @PrimaryKey(autoGenerate = true)
     val itemId: Int= BarnItemDB.UNDEFINED_ID,
-    val name:String = "",
-val createdTime:String =""
+    var name:String = "",
+    val createdTime:String =""
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

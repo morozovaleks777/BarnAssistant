@@ -2,6 +2,7 @@ package com.example.barnassistant.domain.repository
 
 import androidx.lifecycle.LiveData
 import com.example.barnassistant.data.DataOrException
+import com.example.barnassistant.data.Resource
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
@@ -11,16 +12,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 interface RoomRepository {
-
+suspend fun deleteBarnItemList(name:Int)
         suspend fun deleteBarnItem(barnItem: BarnItem)
         suspend fun editBarnItem(barnItem: BarnItemDB)
         fun getAmount(list: List<BarnItem>):Float
         suspend fun getBarnItem(ItemId: Int): BarnItemDB
-        fun getBarnList(): LiveData<List<BarnItemDB>>
+        fun getBarnItemDBList(): Flow<List<BarnItemDB>>
         suspend fun addBarnItem(barnItem: BarnItem)
         suspend fun getCurrentTime():String
 
-
+suspend fun getItem(itemId:Int):Resource<BarnItemDB>
+    fun getItemDBList():Resource< Flow<List<BarnItemDB>>>
 
 suspend fun addName(nameBarnItemList: NameBarnItemList)
 
@@ -45,9 +47,10 @@ suspend fun addName(nameBarnItemList: NameBarnItemList)
 //                }
 
  fun getList():Flow<List<NameBarnItemList>>
- suspend fun getBarnItemName(nameBarnItemList: NameBarnItemList):NameBarnItemList
+ //suspend fun getBarnItemName(nameBarnItemList: NameBarnItemList):NameBarnItemList
  suspend fun getBarnItemName(name: String):NameBarnItemList
 
     suspend fun getBarnItemNameFromName(name:String): NameBarnItemList
     suspend fun deleteNameBarnItem(nameBarnItemList: NameBarnItemList)
+    suspend fun deleteNameBarnItem2(nameBarnItemList: NameBarnItemList)
 }

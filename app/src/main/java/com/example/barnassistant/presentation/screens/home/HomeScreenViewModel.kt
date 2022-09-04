@@ -2,8 +2,8 @@ package com.example.barnassistant.presentation.screens.home
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.barnassistant.data.BarnListMapper
@@ -12,27 +12,35 @@ import com.example.barnassistant.data.room.RoomRepositoryImpl
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
-import com.example.barnassistant.domain.repository.FireRepository
 import com.example.barnassistant.domain.repository.RoomRepository
+import com.example.barnassistant.domain.useCases.GetBarnListUseCase
 import com.example.barnassistant.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val repository: RoomRepositoryImpl,
-    private  val utils: Utils
+    private val repository: RoomRepository,
+    private val getBarnListUseCase: GetBarnListUseCase,
+    private  val utils: Utils,
+    val mapper: BarnListMapper
 ): ViewModel() {
     var data: MutableState<DataOrException<List<NameBarnItemList>, Boolean, Exception>> =
         mutableStateOf(DataOrException(listOf(), true, Exception("")))
-    val listBarn = repository.getFavorites()
+
+   val listBarn =getBarnListUseCase.getBarnList()
     val listName = repository.getList()
-   private  val _nameList = MutableStateFlow<List<NameBarnItemList>>(emptyList())
+    val _nameList = MutableStateFlow<List<NameBarnItemList>>(listOf()) //emptyList()
     val barnItemNameList = MutableStateFlow(NameBarnItemList())
+
+
     init {
+
       getAllBooksFromDatabase()
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -51,28 +59,29 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private val time = mutableStateOf("")
-    fun getTime(): String {
+    val time = mutableStateOf("")
+    fun getTime() {
         time.value = utils.getCurrentTime()
-        return time.value
+         time.value
+        Log.d("test", "getTime: ${time.value}")
 
 
     }
 
 
-    private fun getAllBooksFromDatabase() {
+fun getAllBooksFromDatabase() {
 
         viewModelScope.launch {
             repository.getList().distinctUntilChanged()
                 .collect {
                         listOfFavs ->
-                    if(listOfFavs.isNullOrEmpty()){
-                        Log.d("test", ": is empty ")
-                    }else{
+//                    if(listOfFavs.isNullOrEmpty()){
+//                        Log.d("test", ": is empty ")
+//                    }else{
 
                         _nameList.value = listOfFavs
                         Log.d("test", " list of names: ${_nameList.value} ")
-                    }
+                   // }
                 }
             data.value.loading = true
 
@@ -86,7 +95,7 @@ class HomeScreenViewModel @Inject constructor(
 
 
     }
-    fun getNameBarnItemList(nameBarnItemList: NameBarnItemList) {
+    fun getNameBarnItemList(nameBarnItemList:String) {
         viewModelScope.launch {
             repository.getBarnItemName(nameBarnItemList)
         }
@@ -94,6 +103,8 @@ class HomeScreenViewModel @Inject constructor(
         fun getNameBarnItemListFromName(name: String) {
            viewModelScope.launch {
             barnItemNameList.value=    repository.getBarnItemNameFromName(name)
+//barnItemNameList2.value=barnItemNameList.value
+
                Log.d("test", "getNameBarnItemListFromName: ${barnItemNameList.value}")
             }
 
@@ -103,7 +114,12 @@ class HomeScreenViewModel @Inject constructor(
         fun addNameBarnItemList(nameBarnItemList: NameBarnItemList) {
             viewModelScope.launch {
                 repository.getCurrentTime()
-                repository.addName(nameBarnItemList)
+          //  getNameBarnItemListFromName(nameBarnItemList.name)
+                if(!_nameList.value.isNullOrEmpty() && !_nameList.value.contains(nameBarnItemList)||barnItemNameList.value.name=="" )
+                {
+                    repository.addName(nameBarnItemList)
+                    Log.d("test", "addNameBarnItemList: ${_nameList.value}")
+                }
 
                 Log.d(
                     "test",
@@ -114,8 +130,24 @@ class HomeScreenViewModel @Inject constructor(
 
         fun removeCard(nameBarnItemList: NameBarnItemList) {
             viewModelScope.launch {
-                repository.deleteNameBarnItem(nameBarnItemList)
+                Log.d("test", "removeCard:before nameBarnItemList ${nameBarnItemList} ")
+                if(nameBarnItemList.name=="") {repository.deleteNameBarnItem(nameBarnItemList)
+                getAllBooksFromDatabase()}
+if(nameBarnItemList.name==barnItemNameList.value.name){
+
+                Log.d("test", "removeCard: nameBarnItemList ${nameBarnItemList} ")
+                Log.d("test", "removeCard: listName ${_nameList.value} ")
+
+getAllBooksFromDatabase()
+    Log.d("test", "removeCard: listName2 ${_nameList.value} ")}
+                getAllBooksFromDatabase()
+                repository.deleteNameBarnItem(barnItemNameList.value)
+                getAllBooksFromDatabase()
             }
+
+getAllBooksFromDatabase()
+            Log.d("test", "removeCard: listName3 ${_nameList.value} ")
+
         }
 
 }

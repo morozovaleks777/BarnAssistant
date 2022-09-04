@@ -1,29 +1,35 @@
 package com.example.barnassistant.presentation.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,14 +39,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
 import com.example.barnassistant.domain.model.BarnItemDB
-import com.example.barnassistant.domain.model.MBook
 import com.example.barnassistant.presentation.navigation.AppScreens
+import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -152,17 +156,23 @@ fun BarnAppBar(
     icon: ImageVector? = null,
     showProfile: Boolean = true,
     navController: NavController,
+    onSearchClicked:() -> Unit = {},
     onBackArrowClicked:() -> Unit = {}
 ) {
 
     TopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically){
             if (showProfile) {
-                Icon(imageVector = Icons.Default.Favorite,
-                    contentDescription = "Logo Icon",
+                Icon(imageVector = Icons.Default.Search,
+                    contentDescription = "search Icon",
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .scale(0.9f)
+                        .clickable {
+                            onSearchClicked.invoke()
+                        }
+
+
                 )
 
             }
@@ -292,10 +302,16 @@ fun NoteRow(
 
 }
 
+@ExperimentalFoundationApi
 @Composable
-fun ListCard(book: String,
+fun ListCard(
+    modifier: Modifier = Modifier,
+    book: String,
+    time: String,
+    onLongPressed: (String) -> Unit = {},
+    onPressDetails: (String) -> Unit = {},
 
-             onPressDetails: (String) -> Unit = {}) {
+) {
     val context = LocalContext.current
     val resources = context.resources
 
@@ -303,15 +319,28 @@ fun ListCard(book: String,
 
     val screenWidth = displayMetrics.widthPixels / displayMetrics.density
     val spacing = 10.dp
-
+    val isRotated = remember { mutableStateOf(false) }
+    val angle: Float by animateFloatAsState(
+        targetValue = if (isRotated.value) 360F else 0F,
+        animationSpec = tween(
+            durationMillis = 3000, // duration
+            easing = FastOutSlowInEasing
+        )
+    )
     Card(shape = RoundedCornerShape(29.dp),
         backgroundColor = Color.Green,
         elevation = 6.dp,
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .height(242.dp)
-            .width(202.dp)
-            .clickable { onPressDetails.invoke( book  )}) {
+            .rotate(angle)
+            .pointerInput(Unit) {
+detectTapGestures (
+    onLongPress =  {
+        isRotated.value=true
+        onLongPressed.invoke(book) },
+    onDoubleTap = {onPressDetails.invoke(book)})
+            }) {
 
         Column(
             modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
@@ -332,11 +361,11 @@ fun ListCard(book: String,
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.FavoriteBorder,
-                        contentDescription = "Fav Icon",
-                        modifier = Modifier.padding(bottom = 1.dp)
-                    )
+//                    Icon(
+//                        imageVector = Icons.Rounded.FavoriteBorder,
+//                        contentDescription = "Fav Icon",
+//                        modifier = Modifier.padding(bottom = 1.dp)
+//                    )
 
 //                    BookRating(score = book.rating!!)
                 }
@@ -349,7 +378,8 @@ fun ListCard(book: String,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Text(text = "time", modifier = Modifier.padding(4.dp),
+
+            Text(text = time, modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.caption)
 
             val isStartedReading = remember {
@@ -386,3 +416,183 @@ fun TitleSection(modifier: Modifier = Modifier,
     }
 
 }
+
+@ExperimentalMaterialApi
+@Composable
+ fun LazyColumnBarnItemDB(
+    listBarnItemDB: List<BarnItemDB>,
+    viewModel: BarnItemViewModel,
+    name: MutableState<String>,
+    count: MutableState<String>,
+    price: MutableState<String>,
+    itemId: MutableState<Int>,
+    listName: MutableState<String>
+) {
+    LazyColumn {
+        items(items = listBarnItemDB) { it ->
+
+            val barn = it
+            var unread by remember { mutableStateOf(false) }
+            val dismissState = rememberDismissState(
+                confirmStateChange = {
+                    if (it == DismissValue.DismissedToEnd) {
+                        unread = !unread
+                    }
+                    if (it == DismissValue.DismissedToStart) {
+                        viewModel.removeItem(barn)
+
+
+                    }
+                    //  it != DismissValue.DismissedToEnd
+                    false
+
+                }
+            )
+            SwipeToDismiss(
+                state = dismissState,
+                modifier = Modifier.padding(vertical = 4.dp),
+                directions = setOf(
+                    DismissDirection.StartToEnd,
+                    DismissDirection.EndToStart
+                ),
+                dismissThresholds = { direction ->
+                    FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
+                },
+                background = {
+                    val direction =
+                        dismissState.dismissDirection ?: return@SwipeToDismiss
+                    val color by animateColorAsState(
+                        when (dismissState.targetValue) {
+                            DismissValue.Default -> Color.Unspecified
+                            DismissValue.DismissedToEnd -> Color.Green
+                            DismissValue.DismissedToStart -> Color.Red
+                        }
+                    )
+                    val alignment = when (direction) {
+                        DismissDirection.StartToEnd -> Alignment.CenterStart
+                        DismissDirection.EndToStart -> Alignment.CenterEnd
+                    }
+                    val icon = when (direction) {
+                        DismissDirection.StartToEnd -> Icons.Default.Done
+                        DismissDirection.EndToStart -> {
+                            Icons.Default.Delete
+                        }
+
+
+                    }
+                    val scale by animateFloatAsState(
+                        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+                    )
+
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(color)
+                            .padding(horizontal = 20.dp),
+                        contentAlignment = alignment
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.scale(scale)
+                        )
+                    }
+                },
+                dismissContent = {
+
+                    NoteRow(
+                        barnItem = BarnItemDB(
+                            name = it.name,
+                            count = it.count,
+                            price = it.price,
+                            itemId = it.itemId,
+                            listName = it.listName
+
+                        ),
+                        name = it.name,
+                        count = it.count.toString(),
+                        price = it.price.toString(),
+                        sum = viewModel.getItemSum(it),
+                        stringSum = when (it.count <= 1) {
+                            true -> ""
+                            else -> "sum :"
+                        }
+                    ) {
+                        name.value = it.name
+                        count.value = it.count.toString()
+                        price.value = it.price.toString()
+                        itemId.value = it.itemId
+                        listName.value = it.listName
+                        Log.d("test", "DetailBarnListScreen: $it ")
+
+                    }
+                })
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun ButtonWithLongPress(
+    onClick: () -> Unit,
+    onDoubleClick:()->Unit = {},
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit
+) {
+    val contentColor by colors.contentColor(enabled)
+    Surface(
+        onClick = { },
+        modifier = modifier
+            .combinedClickable(
+                interactionSource,
+                rememberRipple(),
+                true,
+                null,
+                Role.Button,
+                null,
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+                onDoubleClick = {onDoubleClick()}),
+        enabled = enabled,
+        shape = shape,
+        color = colors.backgroundColor(enabled).value,
+        contentColor = contentColor.copy(alpha = 1f),
+        border = border,
+        elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
+        interactionSource = interactionSource,
+    ) {
+        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
+            ProvideTextStyle(
+                value = MaterialTheme.typography.button
+            ) {
+                Row(
+                    Modifier
+                        .defaultMinSize(
+                            minWidth = ButtonDefaults.MinWidth,
+                            minHeight = ButtonDefaults.MinHeight
+                        )
+                        .padding(contentPadding)
+                        .combinedClickable(interactionSource,
+                            null,
+                            true,
+                            null,
+                            Role.Button,
+                            null,
+                            onClick = { onClick() },
+                            onLongClick = { onLongClick() },
+                            onDoubleClick = { onDoubleClick() }),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            }
+        }
+    }}

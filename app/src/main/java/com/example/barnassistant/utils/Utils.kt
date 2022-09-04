@@ -22,7 +22,7 @@ class Utils @Inject constructor(){
         val timeText: String = timeFormat.format(currentDate)
         while (true) {
           //  delay(1000)
-            return "$timeText \n $dateText"
+            return " $dateText"
         }
     }
 }

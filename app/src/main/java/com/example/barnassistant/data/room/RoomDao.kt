@@ -31,8 +31,8 @@ interface RoomDao {
     @Query("DELETE FROM barn_tbl WHERE itemId=:barnItemId")
     suspend fun deleteBarnItem(barnItemId:Int)
 
-    @Query("SELECT * FROM barn_tbl")
-    fun getBarnItemList(): LiveData<List<BarnItemDB>>
+//    @Query("SELECT * FROM barn_tbl")
+//    fun getBarnItemList(): LiveData<List<BarnItemDB>>
 
 
     @Query("SELECT * FROM barn_tbl WHERE itemId=:barnItemId LIMIT 1")
@@ -45,7 +45,10 @@ interface RoomDao {
    //NameBarnItemList
 
     @Query("DELETE FROM barnItemList_tbl WHERE itemId=:itemId")
-    suspend fun deleteNameBarnItemList(itemId:Int)
+    suspend fun deleteNameBarnItemList(itemId: Int)
+
+    @Query("DELETE  FROM barnItemList_tbl WHERE Name=:name ")
+    suspend fun deleteNameBarnItemList2(name:String)
 
     @Query("SELECT * FROM barnItemList_tbl")
     fun getNameBarnItemListList(): LiveData<List<NameBarnItemList>>
@@ -56,6 +59,7 @@ interface RoomDao {
 
     @Query("SELECT * FROM barnItemList_tbl WHERE name=:name LIMIT 1")
     suspend fun getNameBarnItemListFromName(name:String):NameBarnItemList
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addNameBarnItemList(nameBarnItemList: NameBarnItemList)
