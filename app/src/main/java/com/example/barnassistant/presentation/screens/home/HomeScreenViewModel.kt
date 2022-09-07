@@ -133,19 +133,15 @@ fun getAllBooksFromDatabase() {
                 Log.d("test", "removeCard:before nameBarnItemList ${nameBarnItemList} ")
                 if(nameBarnItemList.name=="") {repository.deleteNameBarnItem(nameBarnItemList)
                 getAllBooksFromDatabase()}
-if(nameBarnItemList.name==barnItemNameList.value.name){
 
-                Log.d("test", "removeCard: nameBarnItemList ${nameBarnItemList} ")
-                Log.d("test", "removeCard: listName ${_nameList.value} ")
-
-getAllBooksFromDatabase()
-    Log.d("test", "removeCard: listName2 ${_nameList.value} ")}
                 getAllBooksFromDatabase()
+                delay(2500)
+                if(!_nameList.value.isNullOrEmpty()){
                 repository.deleteNameBarnItem(barnItemNameList.value)
-                getAllBooksFromDatabase()
+                getAllBooksFromDatabase()}
             }
 
-getAllBooksFromDatabase()
+//getAllBooksFromDatabase()
             Log.d("test", "removeCard: listName3 ${_nameList.value} ")
 
         }

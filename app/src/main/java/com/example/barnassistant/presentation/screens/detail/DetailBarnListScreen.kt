@@ -334,9 +334,15 @@ val time= rememberSaveable {
                     homeViewModel.getTime()
                     time.value=homeViewModel.time.value
                     Log.d("test", "EditForm: after ${time.value}")
-
-                    homeViewModel.addNameBarnItemList(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))
-                    Log.d("test", "EditForm: $list")
+if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))) {
+    homeViewModel.addNameBarnItemList(
+        NameBarnItemList(
+            name = listName.value,
+            createdTime = "Time :${time.value}"
+        )
+    )
+    Log.d("test", "EditForm: $list")
+}
                 }
                 else -> {
                     viewModel.editBarnItem(

@@ -60,25 +60,28 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
     return sum
 }
 
-    private val _roomBarnList = MutableStateFlow<List<BarnItemDB>>(emptyList())
+     val _roomBarnList = MutableStateFlow<List<BarnItemDB>>(emptyList())
     val favList = _roomBarnList.asStateFlow()
    init{
 
-           viewModelScope.launch(Dispatchers.IO) {
-             getBarnListUseCase.getBarnList().distinctUntilChanged()
-                   .collect {
-                           listOfFavs ->
-                       if(listOfFavs.isNullOrEmpty()){
-                           Log.d("test", ": is empty ")
-                       }else{
-                           _roomBarnList.value = listOfFavs
-                           Log.d("test", ": ${favList.value} ")
-                       }
-                   }
-
-           }
+       getBarnItemList()
 
 }
+
+    fun getBarnItemList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getBarnListUseCase.getBarnList().distinctUntilChanged()
+                .collect { listOfFavs ->
+                    if (listOfFavs.isNullOrEmpty()) {
+                        Log.d("test", ": is empty ")
+                    } else {
+                        _roomBarnList.value = listOfFavs
+                        Log.d("test", ": ${favList.value} ")
+                    }
+                }
+
+        }
+    }
 
     fun getBarnItem(barnItemId:Int){
         viewModelScope.launch {

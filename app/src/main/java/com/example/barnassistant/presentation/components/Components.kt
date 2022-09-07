@@ -1,9 +1,10 @@
 package com.example.barnassistant.presentation.components
 
 import android.util.Log
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -17,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -39,6 +46,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -302,6 +311,8 @@ fun NoteRow(
 
 }
 
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @Composable
 fun ListCard(
@@ -323,28 +334,78 @@ fun ListCard(
     val angle: Float by animateFloatAsState(
         targetValue = if (isRotated.value) 360F else 0F,
         animationSpec = tween(
-            durationMillis = 3000, // duration
+            durationMillis = 2500, // duration
             easing = FastOutSlowInEasing
         )
     )
-    Card(shape = RoundedCornerShape(29.dp),
-        backgroundColor = Color.Green,
-        elevation = 6.dp,
+
+    var expanded by remember { mutableStateOf(false) }
+     AnimatedContent(
+
+        targetState = expanded,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(150, 150)) with
+                    fadeOut(animationSpec = tween(150)) using
+                    SizeTransform { initialSize, targetSize ->
+                        if (targetState) {
+                            keyframes {
+                                // Expand horizontally first.
+                                IntSize(targetSize.width, initialSize.height) at 150
+                                durationMillis = 300
+                            }
+                        } else {
+                            keyframes {
+                                // Shrink vertically first.
+                                IntSize(initialSize.width, targetSize.height) at 150
+                                durationMillis = 300
+                            }
+                        }
+                    }
+        }
+    )
+    { targetExpanded ->
+        if (targetExpanded) {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = "Fav Icon",
+                modifier = Modifier
+                    .padding(bottom = 1.dp)
+                    .clickable {
+                        expanded=false
+                    }
+
+
+            )
+        } else {
+
+
+            val myColor=Color(0xFFBB86FC)
+
+    Card(shape = RoundedCornerShape(size = 29.dp,),
+      backgroundColor = myColor.copy(alpha = 0.3f),
+
+        elevation = -1.dp,
         modifier = modifier
-            .padding(16.dp)
-            .height(242.dp)
+
+           .padding(16.dp)
+           .height(242.dp)
             .rotate(angle)
             .pointerInput(Unit) {
-detectTapGestures (
-    onLongPress =  {
-        isRotated.value=true
-        onLongPressed.invoke(book) },
-    onDoubleTap = {onPressDetails.invoke(book)})
+                detectTapGestures(
+                    onLongPress = {
+                        isRotated.value = true
+                        onLongPressed.invoke(book)
+                    },
+                    onDoubleTap = { expanded=true
+                       // onPressDetails.invoke(book)
+                    },
+                onTap = {onPressDetails.invoke(book)})
             }) {
 
         Column(
-            modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
-            horizontalAlignment = Alignment.Start
+           modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
+            horizontalAlignment = Alignment.End,
+       verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(horizontalArrangement = Arrangement.Center) {
 
@@ -354,33 +415,55 @@ detectTapGestures (
 //                        .height(140.dp)
 //                        .width(100.dp)
 //                        .padding(4.dp))
-                Spacer(modifier = Modifier.width(50.dp))
+                Spacer(modifier = Modifier.width(30.dp))
 
-                Column(
-                    modifier = Modifier.padding(top = 25.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-//                    Icon(
-//                        imageVector = Icons.Rounded.FavoriteBorder,
-//                        contentDescription = "Fav Icon",
-//                        modifier = Modifier.padding(bottom = 1.dp)
-//                    )
-
-//                    BookRating(score = book.rating!!)
-                }
+//                Column(
+//                    modifier = Modifier.padding(top = 25.dp),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//
+//                ) {
+//
+//
+//                   // BookRating(score = book.rating!!)
+//                }
 
             }
             Text(
-                text = book, modifier = Modifier.padding(4.dp),
+
+                text = book, modifier = Modifier
+                    .padding(4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .height(15.dp)
+                    .background(
+                        Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Blue,
+                            Color.Green
+                        )
+                    ))
+                ,
+
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
 
-            Text(text = time, modifier = Modifier.padding(4.dp),
+            Text(text = time, modifier = Modifier
+                .padding(4.dp)
+                .align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.caption)
+
+//            Icon(
+//                imageVector = Icons.Rounded.Done,
+//                contentDescription = "Fav Icon",
+//                modifier = Modifier
+//                    .padding(bottom = 1.dp)
+//                    .align(Alignment.End)
+//
+//
+//            )
 
             val isStartedReading = remember {
                 mutableStateOf(false)
@@ -390,17 +473,49 @@ detectTapGestures (
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
             ) {
-                //   isStartedReading.value = book.startedReading != null
+              //  isStartedReading.value = book.startedReading != null
 
 
-//            RoundedButton(label = if (isStartedReading.value)  "Reading" else "Not Yet",
-//                radius = 70)
+            RoundedButton(label = if (isStartedReading.value)  "Done" else "Not Yet",
+                radius = 70)
 
             }
         }
 
 
     }}
+    }
+    }
+
+@Preview
+@Composable
+fun RoundedButton(
+    label: String = "Reading",
+    radius: Int = 29,
+    onPress: () -> Unit = {}) {
+    Surface(modifier = Modifier.clip(RoundedCornerShape(
+        bottomEndPercent = radius,
+        topStartPercent = radius)),
+        color = Color(0xFF92CBDF),
+
+
+            ) {
+
+        Column(modifier = Modifier
+            .width(90.dp)
+           .heightIn(40.dp)
+            .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = label, style = TextStyle(color = Color.Black,
+                fontSize = 15.sp),)
+
+        }
+
+    }
+
+
+}
 
 @Composable
 fun TitleSection(modifier: Modifier = Modifier,
