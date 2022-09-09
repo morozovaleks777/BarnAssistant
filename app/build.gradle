@@ -51,10 +51,29 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.datastore:datastore-core:1.0.0'
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
+
+    //workManager
+    def work_version = "2.7.1"
+
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+    // optional - GCMNetworkManager support
+    implementation "androidx.work:work-gcm:$work_version"
+    // optional - Test helpers
+    androidTestImplementation "androidx.work:work-testing:$work_version"
+    // optional - Multiprocess support
+    implementation "androidx.work:work-multiprocess:$work_version"
+
     //firebase
+
     implementation platform('com.google.firebase:firebase-bom:29.2.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.1.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     //Dagger - Hilt
     implementation 'com.google.dagger:hilt-android:2.39.1'
@@ -100,6 +119,7 @@ dependencies {
     // JSON Converter
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    implementation 'androidx.compose.material3:material3:1.0.0-alpha14'
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.5.0'
     implementation 'com.google.android.material:material:1.6.1'
