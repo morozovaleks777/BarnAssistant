@@ -122,7 +122,7 @@ fun SplashScreen(navController: NavController){
 private fun Animat(navController: NavController) {
     Box(
         modifier = Modifier
-            //  .fillMaxSize()
+             .fillMaxSize()
             .height(100.dp)
         // .background(MaterialTheme.colors.primary)
     ) {

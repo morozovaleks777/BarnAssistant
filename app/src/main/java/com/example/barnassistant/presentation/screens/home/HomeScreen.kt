@@ -55,8 +55,9 @@ detailViewModel: BarnItemViewModel = hiltViewModel(),
             }
 
         }) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-
+        Surface(modifier = Modifier.fillMaxSize()
+            .padding(it)
+            ) {
             HomeContent(navController, viewModel,detailViewModel, isSearchIconClicked = isSearchIconClicked.value)
         }
     }
