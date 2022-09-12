@@ -10,11 +10,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
+//import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.detail.DetailBarnListScreen
 import com.example.barnassistant.presentation.screens.home.HomeScreen
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import com.example.barnassistant.presentation.screens.login.LoginScreen
+import com.example.barnassistant.presentation.screens.message_list_screen.MessageListScreen
 import com.example.barnassistant.presentation.screens.splash.SplashScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreenViewModel
@@ -72,6 +75,17 @@ fun AppNavigation() {
             val updateViewModel = hiltViewModel<UpdateScreenViewModel>()
                 UpdateScreen(navController = navController,viewModel,detailViewModel, curName = it.toString(),updateViewModel)
             }
+        }
+    val channelListName = AppScreens.ChannelListScreen.name
+        composable(channelListName) {
+          ChannelListScreen(navController = navController)
+        }
+        val messageListName = AppScreens.MessageListScreen.name
+        composable("$messageListName/{cid}") { backStackEntry ->
+            MessageListScreen(
+                navController = navController,
+                cid = backStackEntry.arguments?.getString("cid")!!
+            )
         }
 
     }

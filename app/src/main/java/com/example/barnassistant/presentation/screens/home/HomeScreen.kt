@@ -79,7 +79,7 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel,det
     val currentUserName = if (!email.isNullOrEmpty())
         FirebaseAuth.getInstance().currentUser?.email?.split("@")
             ?.get(0)else
-        "N/A"
+        "N.A"
     Column(Modifier.padding(2.dp),
         verticalArrangement = Arrangement.Top) {
         Row(modifier = Modifier.align(alignment = Alignment.Start)) {
@@ -91,7 +91,8 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel,det
                     contentDescription = "Profile",
                     modifier = Modifier
                         .clickable {
-                            navController.navigate(AppScreens.ReaderStatsScreen.name)
+                           // navController.navigate(AppScreens.ReaderStatsScreen.name)
+                            navController.navigate(AppScreens.ChannelListScreen.name)
                         }
                         .size(45.dp),
                     tint = MaterialTheme.colors.secondaryVariant)

@@ -13,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.getstream.chat.android.compose.viewmodel.messages.MessageListViewModel
 import javax.inject.Singleton
 
 
@@ -20,13 +21,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
+
     @Singleton
     @Provides
     fun provideFireBookRepository()
             = FireRepository(queryBook = FirebaseFirestore.getInstance()
         .collection("books"))
-
-
 
         @Singleton
         @Provides
