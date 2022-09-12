@@ -139,11 +139,9 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel,det
             navController =navController ,detailViewModel, homeViewModel = viewModel)
         TitleSection(label = "Previous  Lists")
 
-        if (nameOfList != null) {
-            OllListArea(nameOfList = nameOfList, time=time.value,listOfNameBarnItemList = listOfNameBarnItemList,
-                navController = navController,
-                viewModel = detailViewModel, homeViewModel = viewModel)
-       }
+        OllListArea(nameOfList = nameOfList, time=time.value,listOfNameBarnItemList = listOfNameBarnItemList,
+            navController = navController,
+            viewModel = detailViewModel, homeViewModel = viewModel)
 
 
 
