@@ -20,7 +20,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.barnassistant.presentation.navigation.AppNavigation
-import com.example.barnassistant.presentation.screens.home.Home
 import com.example.barnassistant.ui.theme.BarnAssistantTheme
 import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalMaterialApi
@@ -31,28 +30,13 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            Toast.makeText(this, "FCM can't post notifications without POST_NOTIFICATIONS permission",
-                Toast.LENGTH_LONG).show()
-        }
-    }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             BarnAssistantTheme {
-               BarnAssistantApp(intent = intent,this)
+               BarnAssistantApp()
 
-
-               // Home(intent = intent, activity =this )
 
             }
         }
@@ -65,13 +49,13 @@ class MainActivity : ComponentActivity() {
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable
-fun BarnAssistantApp(intent:Intent,activity: MainActivity) {
+fun BarnAssistantApp() {
     // A surface container using the 'background' color from the theme
     Surface(color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize() ) {
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-//Home(intent = intent, activity =activity )
+
            AppNavigation()
         }
 
@@ -88,6 +72,6 @@ fun BarnAssistantApp(intent:Intent,activity: MainActivity) {
 @Composable
 fun DefaultPreview() {
     BarnAssistantTheme {
-       // BarnAssistantApp()
+      BarnAssistantApp()
     }
 }
