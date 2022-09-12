@@ -21,28 +21,18 @@ import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.CreateButton
 import com.google.firebase.auth.FirebaseAuth
 import io.getstream.chat.android.client.ChatClient
-import io.getstream.chat.android.client.api.models.QueryChannelRequest
-import io.getstream.chat.android.client.extensions.internal.addMember
-import io.getstream.chat.android.client.extensions.internal.updateLastMessage
-import io.getstream.chat.android.client.extensions.internal.updateMember
 import io.getstream.chat.android.client.logger.ChatLogLevel
-import io.getstream.chat.android.client.models.Channel
-import io.getstream.chat.android.client.models.Member
-import io.getstream.chat.android.client.models.Message
 import io.getstream.chat.android.client.models.User
 import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
 import io.getstream.chat.android.compose.ui.theme.ChatTheme
-import io.getstream.chat.android.core.internal.InternalStreamChatApi
 import io.getstream.chat.android.offline.model.message.attachments.UploadAttachmentsNetworkType
 import io.getstream.chat.android.offline.plugin.configuration.Config
 import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFactory
-import java.io.File
-import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 
-@OptIn(InternalStreamChatApi::class, ExperimentalComposeUiApi::class)
+@OptIn( ExperimentalComposeUiApi::class)
 @Composable
 fun ChannelListScreen(
     navController: NavController,
@@ -52,9 +42,7 @@ fun ChannelListScreen(
 val userName= rememberSaveable {
     mutableStateOf("")
 }
-//    val userNameList= rememberSaveable {
-//        mutableListOf<String>("")
-//    }
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
     val offlinePluginFactory = StreamOfflinePluginFactory(
@@ -105,7 +93,7 @@ val client = ChatClient.Builder("zp2zrhmrf4mz", appContext = context)
         ChatTheme {
             Column() {
 
-var list= mutableListOf<String>()
+val list= mutableListOf<String>()
                 com.example.barnassistant.presentation.components.InputField(valueState = userName,
                     labelId = "enter  name",
                     keyboardType = KeyboardType.Text,
@@ -121,7 +109,7 @@ userNameList.add(userName.value)
                     validInputs =true ) {
 list.addAll(0,userNameList)
 
-                    Log.d("testik", "ChannelListScreen:list ${list}")
+                    Log.d("testik", "ChannelListScreen:list $list")
 
 
 
@@ -144,7 +132,7 @@ list.addAll(0,userNameList)
                            .create(list, emptyMap()).enqueue()
 
                     navController.navigate("${AppScreens.MessageListScreen.name}/messaging:${i.value}")
-                      // navController.navigate("${AppScreens.MessageListScreen.name}/${cs.cid}")
+
                     },
 
                     isShowingHeader = true,

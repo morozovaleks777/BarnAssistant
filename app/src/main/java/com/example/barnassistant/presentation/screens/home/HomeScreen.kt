@@ -11,7 +11,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,7 +34,6 @@ import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
@@ -211,7 +213,7 @@ fun HorizontalScrollableComponentAllList(listOfBooks: List<NameBarnItemList>,
             .horizontalScroll(scrollState)
     ) {
 
-        if (listOfBooks.isNullOrEmpty()|| listOfBooks[0].name=="") {
+        if (listOfBooks.isEmpty()|| listOfBooks[0].name=="") {
             Surface(modifier = Modifier.padding(23.dp)) {
                 Text(
                     text = "No list found. Add a List",
@@ -262,7 +264,7 @@ fun HorizontalScrollableComponentLastList(
             .horizontalScroll(scrollState)
     ) {
 
-        if (listOfListsName.isNullOrEmpty()) {
+        if (listOfListsName.isEmpty()) {
             Surface(modifier = Modifier.padding(23.dp)) {
                 Text(
                     text = "No list found. Search a List",
@@ -345,10 +347,10 @@ fun OllListArea(nameOfList:NameBarnItemList, time:String,
                 homeViewModel: HomeScreenViewModel) {
 
     val listBarnItemDB = viewModel.favList.collectAsState().value
-    HorizontalScrollableComponentAllList(listOfNameBarnItemList, time = time, onLongPressed = {
+    HorizontalScrollableComponentAllList(listOfNameBarnItemList, time = time, onLongPressed = { it ->
         homeViewModel.getNameBarnItemListFromName(it)
         Log.d("test", "OllListArea: $listOfNameBarnItemList ")
-       if(!listOfNameBarnItemList.isNullOrEmpty() )
+       if(listOfNameBarnItemList.isNotEmpty())
        {
 
         val curList=
