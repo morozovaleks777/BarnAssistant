@@ -1,5 +1,6 @@
 package com.example.barnassistant.presentation.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ import com.example.barnassistant.presentation.screens.splash.SplashScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreenViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable

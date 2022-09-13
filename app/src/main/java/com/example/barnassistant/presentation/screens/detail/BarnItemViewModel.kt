@@ -1,12 +1,12 @@
 package com.example.barnassistant.presentation.screens.detail
 
+
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.barnassistant.data.BarnListMapper
-import com.example.barnassistant.data.room.RoomRepositoryImpl
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.repository.RoomRepository
@@ -35,8 +35,8 @@ class BarnItemViewModel @Inject constructor(
 
 
     private val _errorInputName=MutableLiveData<Boolean>()
-            val errorInputName: LiveData<Boolean>
-                get() = _errorInputName
+    val errorInputName: LiveData<Boolean>
+        get() = _errorInputName
 
     private val _errorInputCount=MutableLiveData<Boolean>()
     val errorInputCount: LiveData<Boolean>
@@ -44,41 +44,44 @@ class BarnItemViewModel @Inject constructor(
 
 
     val barnItem = MutableStateFlow<BarnItemDB>(BarnItemDB(name = "", count = 0f))
-var currentListName = "no open lists"
+    var currentListName = "no open lists"
 
     private val _closeScreen=MutableLiveData<Unit>()
     val closeScreen: LiveData<Unit>
         get() = _closeScreen
 
-fun getItemSum(barnItemDB: BarnItemDB):String{
-    var sum=""
-    if(barnItemDB.count>1f){
-     sum=  ( barnItemDB.count*barnItemDB.price).toString()
+    fun getItemSum(barnItemDB: BarnItemDB):String{
+        var sum=""
+        if(barnItemDB.count>1f){
+            sum=  ( barnItemDB.count*barnItemDB.price).toString()
 
+
+        }
+        return sum
+    }
+
+    val _roomBarnList = MutableStateFlow<List<BarnItemDB>>(emptyList())
+    val favList = _roomBarnList.asStateFlow()
+    init{
+
+        getBarnItemList()
 
     }
-    return sum
-}
 
-    private val _roomBarnList = MutableStateFlow<List<BarnItemDB>>(emptyList())
-    val favList = _roomBarnList.asStateFlow()
-   init{
+    fun getBarnItemList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getBarnListUseCase.getBarnList().distinctUntilChanged()
+                .collect { listOfFavs ->
+                    if (listOfFavs.isNullOrEmpty()) {
+                        Log.d("test", ": is empty ")
+                    } else {
+                        _roomBarnList.value = listOfFavs
+                        Log.d("test", ": ${favList.value} ")
+                    }
+                }
 
-           viewModelScope.launch(Dispatchers.IO) {
-             getBarnListUseCase.getBarnList().distinctUntilChanged()
-                   .collect {
-                           listOfFavs ->
-                       if(listOfFavs.isNullOrEmpty()){
-                           Log.d("test", ": is empty ")
-                       }else{
-                           _roomBarnList.value = listOfFavs
-                           Log.d("test", ": ${favList.value} ")
-                       }
-                   }
-
-           }
-
-}
+        }
+    }
 
     fun getBarnItem(barnItemId:Int){
         viewModelScope.launch {
@@ -100,14 +103,14 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
         val listName = parseInputName(inputListName)
         val fieldsValid = validateInput(name, count,price)
 //        if (fieldsValid) {
-            viewModelScope.launch {
+        viewModelScope.launch {
             val barnItem = BarnItem(name=name, count=count, price = price, enabled = true,listName= listName,)
 
-                addBarnItemUseCase.addBarnItem(barnItem)
+            addBarnItemUseCase.addBarnItem(barnItem)
 
-            }
-            finishWork()
-       // }
+        }
+        finishWork()
+        // }
     }
 
     fun editBarnItem(inputName:String?,inputCount:String?,inputPrice: String?,inputListName: String?,inputIteId:Int){
@@ -117,9 +120,9 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
         val price=parseInputPrice(inputPrice )
         val fieldsValid=validateInput(name,count,price)
 //        if(fieldsValid){
-           getBarnItem(inputIteId)
+        getBarnItem(inputIteId)
         Log.d("test", "EditForm: viewModel._barnItem  ${barnItem.value}")
-          //  _barnItem.value?.let {
+        //  _barnItem.value?.let {
         barnItem.value.let {
             viewModelScope.launch {
 
@@ -128,16 +131,16 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
                 finishWork()
             }
         }
-        }
-   // }
+    }
+    // }
 
-   private fun parseInputName(inputName: String?):String{
-         return inputName?.trim() ?: ""
-}
+    private fun parseInputName(inputName: String?):String{
+        return inputName?.trim() ?: ""
+    }
 
     private fun parseInputCount(inputCount: String?):Float{
-      return  try {
-             inputCount?.trim()?.toFloat() ?:0f
+        return  try {
+            inputCount?.trim()?.toFloat() ?:0f
         }
         catch (e:Exception){
             0f
@@ -155,12 +158,12 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
     private fun validateInput(inputName:String, inputCount: Float, inputPrice: Float):Boolean{
         var result=true
         if(inputName.isBlank()) {
-           _errorInputName.value=true
-             result = false
+            _errorInputName.value=true
+            result = false
         }
         if(inputCount<=0){
             _errorInputCount.value=true
-             result =false
+            result =false
         }
         if(inputPrice<=0){
             _errorInputCount.value=true
@@ -181,3 +184,4 @@ fun getItemSum(barnItemDB: BarnItemDB):String{
 
 
 }
+

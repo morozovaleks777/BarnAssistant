@@ -10,7 +10,7 @@ data class NameBarnItemList(
     @NonNull
     @ColumnInfo(name = "itemId")
     @PrimaryKey(autoGenerate = true)
-    val itemId: Int= BarnItemDB.UNDEFINED_ID,
+    val itemId: Int= UNDEFINED_ID,
     var name:String = "",
     val createdTime:String =""
 ) {
@@ -27,10 +27,14 @@ data class NameBarnItemList(
 
     override fun hashCode(): Int {
         return name.hashCode()
+
     }
-
-
-
-
-
+companion object{
+    const val UNDEFINED_ID= 0
 }
+}
+
+
+
+
+

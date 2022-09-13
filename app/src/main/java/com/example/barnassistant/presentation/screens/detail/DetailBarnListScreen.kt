@@ -1,12 +1,8 @@
 package com.example.barnassistant.presentation.screens.detail
 
 import android.util.Log
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,15 +10,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,12 +23,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItem
-import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.components.InputField
 import com.example.barnassistant.presentation.components.LazyColumnBarnItemDB
-import com.example.barnassistant.presentation.components.NoteRow
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 
@@ -68,7 +58,7 @@ fun DetailBarnListScreen(
             }
         }
     ) {
-        Surface {
+        Surface(modifier = Modifier.padding(it)) {
             Column {
                 EditForm(
                     homeViewModel,
@@ -238,9 +228,9 @@ fun EditForm(
     isCreateAccount: Boolean = false,
     onDone: (String) -> Unit = { }
 ) {
-val time= rememberSaveable {
-    mutableStateOf("")
-}
+    val time= rememberSaveable {
+        mutableStateOf("")
+    }
     val keyboardController = LocalSoftwareKeyboardController.current
     val valid = remember(listName.value, name.value, count.value, price.value) {
         listName.value.trim().isNotEmpty()
@@ -334,9 +324,15 @@ val time= rememberSaveable {
                     homeViewModel.getTime()
                     time.value=homeViewModel.time.value
                     Log.d("test", "EditForm: after ${time.value}")
-
-                    homeViewModel.addNameBarnItemList(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))
-                    Log.d("test", "EditForm: $list")
+                    if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))) {
+                        homeViewModel.addNameBarnItemList(
+                            NameBarnItemList(
+                                name = listName.value,
+                                createdTime = "Time :${time.value}"
+                            )
+                        )
+                        Log.d("test", "EditForm: $list")
+                    }
                 }
                 else -> {
                     viewModel.editBarnItem(
@@ -381,8 +377,3 @@ fun CreateButton(
         else Text(text = textId, modifier = Modifier.padding(5.dp))
     }
 }
-
-
-
-
-
