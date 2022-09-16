@@ -2,8 +2,10 @@ package com.example.barnassistant.presentation.screens.home
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.data.DataOrException
 import com.example.barnassistant.domain.model.NameBarnItemList
@@ -17,9 +19,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class HomeScreenViewModel @Inject constructor (
     private val repository: RoomRepository,
     getBarnListUseCase: GetBarnListUseCase,
     private  val utils: Utils,
@@ -35,7 +38,7 @@ class HomeScreenViewModel @Inject constructor(
 
 
     init {
-
+        Log.d("viewModel", ":${this.hashCode()} ")
         getAllBooksFromDatabase()
     }
 

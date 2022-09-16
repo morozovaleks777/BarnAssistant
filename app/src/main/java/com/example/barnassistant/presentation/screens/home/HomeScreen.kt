@@ -12,15 +12,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,13 +26,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.module.kotlin.*
 import com.google.firebase.auth.FirebaseAuth
+import java.io.File
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -63,7 +66,8 @@ fun HomeScreen(
 
         }) {
         Surface(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(it)
         ) {
 
@@ -232,18 +236,17 @@ fun HomeContent(
 //fun HorizontalScrollableComponentAllList(nameOfList: NameBarnItemList,listOfBooks: List<NameBarnItemList>,
 fun HorizontalScrollableComponentAllList(
     listOfBooks: List<NameBarnItemList>,
-    viewModel: HomeScreenViewModel = hiltViewModel(),
+    viewModel: BarnItemViewModel = hiltViewModel(),
     time: String = "",
     onLongPressed: (String) -> Unit,
     onCardPressed: (String) -> Unit,
 
     ) {
-
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
     Row(
         modifier = Modifier
-             .fillMaxWidth()
+            .fillMaxWidth()
             .heightIn(280.dp)
             .horizontalScroll(scrollState)
     ) {
@@ -271,6 +274,32 @@ fun HorizontalScrollableComponentAllList(
                         onLongPressed(it)
                         // viewModel.getNameBarnItemListFromName(it)
                     }, onPressDetails = { onCardPressed(it) },
+                    onDoubleClick = {
+                        val mapper2 = jacksonObjectMapper()
+                        val filteredListBarnItemDb=viewModel._roomBarnList.value.filter { barnItemDB ->
+                            barnItemDB.listName==book.name }
+viewModel.filteredListBarnItemDB.value=filteredListBarnItemDb
+                        try{
+    // create an instance of DefaultPrettyPrinter
+                             val writer = mapper2.writer( DefaultPrettyPrinter());
+
+    // convert book object to JSON file
+  //writer.writeValue(Paths.get("book.json").toFile(), book);
+
+                            val myJson= writer.writeValueAsString(filteredListBarnItemDb)
+   // val obj: List<BarnItemDB> = mapper2.readValue(str)
+                            val file = File(context.filesDir, "list.json") // unresolved reference to context als
+                            file.writeText(myJson)
+
+       -                    Log.d("testos", "HorizontalScrollableComponentAllList: json $myJson ")
+                            Log.d("testos", "HorizontalScrollableComponentAllList: path ${file.absolutePath} ")
+                            Log.d("testos", "HorizontalScrollableComponentAllList: fromFile ${file.readText()} ")
+
+} catch ( ex:Exception) {
+                        ex.printStackTrace();
+                    }
+
+                    }
                 )
             }
         }

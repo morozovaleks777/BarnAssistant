@@ -8,6 +8,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.getstream.chat.android.client.models.User
+import io.getstream.chat.android.core.internal.InternalStreamChatApi
 import io.getstream.chat.android.offline.model.message.attachments.UploadAttachmentsNetworkType
 import io.getstream.chat.android.offline.plugin.configuration.Config
 import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFactory
@@ -16,6 +17,7 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 @HiltAndroidApp
 class BarnAssistantApplication:Application() {
 
+    @OptIn(InternalStreamChatApi::class)
     @SuppressLint("CheckResult")
     override fun onCreate() {
     super.onCreate()
@@ -56,16 +58,15 @@ class BarnAssistantApplication:Application() {
         Log.d("test", "onCreate: token ${token.split("devtoken").get(0)}5km0x67w0RcTI4WswLYOQSlRbipNyQ-QSVjdHKXnYgw")
 
 
-
     client.connectUser(
     user,
        token2
         //"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoibW9yYWxleDI2MCJ9.zLbGPVDvY3WfiBcc331cCeBrWS6Py10wMZ27ai5Kupo"
     ).enqueue()
-client.channel("messaging:messaging","new10").create(listOf("sss"), emptyMap()).enqueue()
-//
-        client.createChannel(channelType = "messaging", channelId = "new10", memberIds = listOf("sss"),
-            mutableMapOf()).enqueue()
+//client.channel("messaging:messaging","new10").create(listOf("sss"), emptyMap()).enqueue()
+////
+//        client.createChannel(channelType = "messaging", channelId = "new10", memberIds = listOf("sss"),
+//            mutableMapOf()).enqueue()
 
 
     }

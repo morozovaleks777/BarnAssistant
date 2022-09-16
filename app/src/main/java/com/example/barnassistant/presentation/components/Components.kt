@@ -321,6 +321,7 @@ fun ListCard(
     time: String,
     onLongPressed: (String) -> Unit = {},
     onPressDetails: (String) -> Unit = {},
+    onDoubleClick: () -> Unit ={}
 
     ) {
     val context = LocalContext.current
@@ -398,6 +399,7 @@ fun ListCard(
                             },
                             onDoubleTap = { expanded=true
                                 // onPressDetails.invoke(book)
+                                onDoubleClick.invoke()
                             },
                             onTap = {onPressDetails.invoke(book)})
                     }) {

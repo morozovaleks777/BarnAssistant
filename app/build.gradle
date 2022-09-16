@@ -53,10 +53,11 @@ android {
 
 dependencies {
     // Stream Chat UI Components
-    implementation "io.getstream:stream-chat-android-compose:5.8.2"
+    implementation "io.getstream:stream-chat-android-compose:5.9.0"
+    
+//jackson
 
-
-
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2"
     //firebase
     implementation platform('com.google.firebase:firebase-bom:29.2.1')
     implementation 'com.google.firebase:firebase-auth-ktx'
@@ -123,5 +124,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+
 
 }

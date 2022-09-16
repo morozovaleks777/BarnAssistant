@@ -22,6 +22,7 @@ import com.example.barnassistant.presentation.screens.message_list_screen.Messag
 import com.example.barnassistant.presentation.screens.splash.SplashScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreenViewModel
+import io.getstream.chat.android.client.ChatClient
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
@@ -78,8 +79,10 @@ fun AppNavigation() {
             }
         }
     val channelListName = AppScreens.ChannelListScreen.name
+
         composable(channelListName) {
-          ChannelListScreen(navController = navController)
+            val barnItemViewModel:BarnItemViewModel= hiltViewModel()
+          ChannelListScreen(navController = navController, client = ChatClient.instance() )
         }
         val messageListName = AppScreens.MessageListScreen.name
         composable("$messageListName/{cid}") { backStackEntry ->
