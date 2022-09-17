@@ -19,7 +19,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,11 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -235,6 +231,7 @@ fun FABContent(onTap: () -> Unit) {
     }
 
 }
+
 @ExperimentalMaterialApi
 @Composable
 fun NoteRow(
@@ -258,22 +255,32 @@ fun NoteRow(
             .clip(RoundedCornerShape(topEnd = 33.dp, bottomStart = 33.dp))
             .fillMaxWidth(),
 
-        color = Color(0xFFDFE6EB),
+//        color =when(barnItem.enabled) {
+//            true -> Color(0xFFBB86FC)
+//            false -> {Color(0xFF9797BB)
+//            }
+       // }
+
         elevation = 6.dp
     ) {
+        Log.d("test", "NoteRow:barnItem.enabled ${barnItem.enabled} ")
         Column(modifier
             .clickable {
                 onNoteClicked(barnItem)
 
             }
+            .background(color=when(barnItem.enabled) {
+                true -> Color(0xFFBB86FC)
+                false -> {Color(0xFF9797BB)
+                }})
             .padding(horizontal = 14.dp, vertical = 6.dp),
-
             horizontalAlignment = Alignment.Start) {
             Text(
                 text = listName,
                 style = MaterialTheme.typography.subtitle2
             )
-            Row(horizontalArrangement = Arrangement.Center,) {
+            Row(horizontalArrangement = Arrangement.Center,
+           ) {
                 Column() {
                     Text(text = "name :", style = MaterialTheme.typography.subtitle1)
                     Text(text = name, style = MaterialTheme.typography.subtitle1)
@@ -372,7 +379,7 @@ fun ListCard(
                 modifier = Modifier
                     .padding(bottom = 1.dp)
                     .clickable {
-                        expanded=false
+                        expanded = false
                     }
 
 
@@ -397,11 +404,12 @@ fun ListCard(
                                 isRotated.value = true
                                 onLongPressed.invoke(book)
                             },
-                            onDoubleTap = { expanded=true
+                            onDoubleTap = {
+                                expanded = true
                                 // onPressDetails.invoke(book)
                                 onDoubleClick.invoke()
                             },
-                            onTap = {onPressDetails.invoke(book)})
+                            onTap = { onPressDetails.invoke(book) })
                     }) {
 
                 Column(
@@ -443,7 +451,8 @@ fun ListCard(
                                         Color.Blue,
                                         Color.Green
                                     )
-                                ))
+                                )
+                            )
                         ,
 
                         fontWeight = FontWeight.Bold,
@@ -478,7 +487,7 @@ fun ListCard(
                         //  isStartedReading.value = book.startedReading != null
 
 
-                        RoundedButton(label = if (isStartedReading.value)  "Done" else "Not Yet",
+                        RoundedButton(label = if (isStartedReading.value)  "Done" else "Not Yet done",
                             radius = 70)
 
                     }
@@ -623,7 +632,8 @@ fun LazyColumnBarnItemDB(
                             count = it.count,
                             price = it.price,
                             itemId = it.itemId,
-                            listName = it.listName
+                            listName = it.listName,
+                           enabled = false
 
                         ),
                         name = it.name,
@@ -635,13 +645,15 @@ fun LazyColumnBarnItemDB(
                             else -> "sum :"
                         }
                     ) {
-                        name.value = it.name
-                        count.value = it.count.toString()
-                        price.value = it.price.toString()
-                        itemId.value = it.itemId
-                        listName.value = it.listName
-                        Log.d("test", "DetailBarnListScreen: $it ")
+//                        name.value = it.name
+//                        count.value = it.count.toString()
+//                        price.value = it.price.toString()
+//                        itemId.value = it.itemId
+//                        listName.value = it.listName
 
+
+                        viewModel.changeEnableState(it)
+                        Log.d("test", "DetailBarnListScreen: $it ")
                     }
                 })
         }

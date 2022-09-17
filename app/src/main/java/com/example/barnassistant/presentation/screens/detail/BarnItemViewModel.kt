@@ -46,7 +46,7 @@ class BarnItemViewModel @Inject constructor(
 
 
 
-val filteredListBarnItemDB= MutableStateFlow(listOf<BarnItemDB>())
+
 
     private val _errorInputName=MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>
@@ -57,7 +57,7 @@ val filteredListBarnItemDB= MutableStateFlow(listOf<BarnItemDB>())
         get() = _errorInputCount
 
 
-    val barnItem = MutableStateFlow<BarnItemDB>(BarnItemDB(name = "", count = 0f))
+    val barnItem = MutableStateFlow<BarnItemDB>(BarnItemDB(name = "", count = 0f, itemId = 0))
     var currentListName = "no open lists"
 
     private val _closeScreen=MutableLiveData<Unit>()
@@ -86,7 +86,7 @@ val filteredListBarnItemDB= MutableStateFlow(listOf<BarnItemDB>())
     fun getBarnItemList() {
         viewModelScope.launch(Dispatchers.IO) {
             getBarnListUseCase.getBarnList().distinctUntilChanged()
-                .collect { listOfFavs ->
+                .collect() { listOfFavs ->
                     if (listOfFavs.isNullOrEmpty()) {
                         Log.d("test", ": is empty ")
                     } else {
@@ -201,12 +201,18 @@ val receivedList= mutableStateOf("")
     fun newListReceived(context: Context,list:String) {
 val mapper= jacksonObjectMapper()
         val obj: List<BarnItemDB> = mapper.readValue(receivedList.value)
-
+        Log.d("TAG", "newListReceived:receivedList.value  ${receivedList.value}")
    for(item in obj){
-       addBarnItem(item.name,item.count.toString(),item.price.toString(),item.listName)
+       addBarnItem(item.name,item.count.toString(),item.price.toString(),item.listName,)
 
    }   }
+    fun changeEnableState(barnItem: BarnItemDB){
+        viewModelScope.launch {
 
+            val newItem = barnItem.copy(enabled =!barnItem.enabled)
+            editBarnItemUseCase.editBarnItem(newItem)
+        }
+    }
 
 }
 

@@ -1,11 +1,13 @@
 package com.example.barnassistant.presentation
 
 import android.app.DownloadManager
+import android.app.DownloadManager.ACTION_DOWNLOAD_COMPLETE
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
-import com.example.barnassistant.MyReseiver
+import com.example.barnassistant.MyReceiver
+import com.example.barnassistant.R
 import com.example.barnassistant.presentation.navigation.AppNavigation
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import com.example.barnassistant.ui.theme.BarnAssistantTheme
+import com.example.barnassistant.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalMaterialApi
@@ -30,18 +34,20 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalFoundationApi
 class MainActivity : ComponentActivity() {
 
-private lateinit var viewModel:BarnItemViewModel
+//private lateinit var viewModel:BarnItemViewModel
+private val viewModel:BarnItemViewModel by  viewModels()
+
 private lateinit var homeViewModel:HomeScreenViewModel
-   lateinit var receiver:MyReseiver
+   lateinit var receiver:MyReceiver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[BarnItemViewModel::class.java]
-        homeViewModel = ViewModelProvider(this)[HomeScreenViewModel::class.java]
-         receiver=MyReseiver( viewModel,homeViewModel)
-val intent =Intent(MyReseiver.ACTION_FILE_DOWNLOAD)
+       // viewModel = ViewModelProvider(this)[BarnItemViewModel::class.java]
+        homeViewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
+         receiver=MyReceiver( viewModel,homeViewModel, Utils())
+//val intent =Intent(MyReseiver.ACTION_FILE_DOWNLOAD)
+
         sendBroadcast(intent)
         val intentFilter=IntentFilter().apply {
-            addAction(MyReseiver.ACTION_FILE_DOWNLOAD)
             addAction(Intent.ACTION_MANAGE_PACKAGE_STORAGE)
             addAction(Intent.CATEGORY_APP_FILES)
             addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)

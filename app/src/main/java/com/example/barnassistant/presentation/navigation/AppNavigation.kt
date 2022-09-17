@@ -81,7 +81,6 @@ fun AppNavigation() {
     val channelListName = AppScreens.ChannelListScreen.name
 
         composable(channelListName) {
-            val barnItemViewModel:BarnItemViewModel= hiltViewModel()
           ChannelListScreen(navController = navController, client = ChatClient.instance() )
         }
         val messageListName = AppScreens.MessageListScreen.name

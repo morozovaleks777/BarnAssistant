@@ -68,7 +68,7 @@ updateScreenViewModel: UpdateScreenViewModel){
             }
 
         }) {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(modifier = Modifier.fillMaxSize().padding(it)) {
           //  HomeContent(navController, viewModel,detailViewModel)
             LazyColumnBarnItemDB(
                 listBarnItemDB =listBarnItemDB ,

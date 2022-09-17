@@ -40,6 +40,7 @@ class RoomRepositoryImpl @Inject constructor (
 
     override suspend fun editBarnItem(barnItem: BarnItemDB) {
         barnListDao.addBarnItem(barnItem)
+       // barnListDao.editBarnItem(barnItem)
 
     }
 

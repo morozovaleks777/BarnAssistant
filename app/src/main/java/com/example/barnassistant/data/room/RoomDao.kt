@@ -19,7 +19,8 @@ interface RoomDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addBarnItem(barnItemDB: BarnItemDB)
-
+@Update()
+suspend fun editBarnItem(barnItemDB: BarnItemDB)
 
 
 //    @Update(onConflict = OnConflictStrategy.REPLACE)

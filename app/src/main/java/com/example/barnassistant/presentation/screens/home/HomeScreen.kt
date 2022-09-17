@@ -29,10 +29,12 @@ import androidx.compose.ui.unit.sp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.Navigator
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.navigation.AppScreens
+import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelViewModel
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.module.kotlin.*
@@ -235,8 +237,10 @@ fun HomeContent(
 @Composable
 //fun HorizontalScrollableComponentAllList(nameOfList: NameBarnItemList,listOfBooks: List<NameBarnItemList>,
 fun HorizontalScrollableComponentAllList(
+    navController: NavController,
     listOfBooks: List<NameBarnItemList>,
     viewModel: BarnItemViewModel = hiltViewModel(),
+    channelViewModel: ChannelViewModel= hiltViewModel(),
     time: String = "",
     onLongPressed: (String) -> Unit,
     onCardPressed: (String) -> Unit,
@@ -275,29 +279,33 @@ fun HorizontalScrollableComponentAllList(
                         // viewModel.getNameBarnItemListFromName(it)
                     }, onPressDetails = { onCardPressed(it) },
                     onDoubleClick = {
-                        val mapper2 = jacksonObjectMapper()
+
                         val filteredListBarnItemDb=viewModel._roomBarnList.value.filter { barnItemDB ->
                             barnItemDB.listName==book.name }
-viewModel.filteredListBarnItemDB.value=filteredListBarnItemDb
-                        try{
-    // create an instance of DefaultPrettyPrinter
-                             val writer = mapper2.writer( DefaultPrettyPrinter());
+                        ChannelViewModel.filteredListBarnItemDB.value=filteredListBarnItemDb
 
-    // convert book object to JSON file
-  //writer.writeValue(Paths.get("book.json").toFile(), book);
-
-                            val myJson= writer.writeValueAsString(filteredListBarnItemDb)
-   // val obj: List<BarnItemDB> = mapper2.readValue(str)
-                            val file = File(context.filesDir, "list.json") // unresolved reference to context als
-                            file.writeText(myJson)
-
-       -                    Log.d("testos", "HorizontalScrollableComponentAllList: json $myJson ")
-                            Log.d("testos", "HorizontalScrollableComponentAllList: path ${file.absolutePath} ")
-                            Log.d("testos", "HorizontalScrollableComponentAllList: fromFile ${file.readText()} ")
-
-} catch ( ex:Exception) {
-                        ex.printStackTrace();
-                    }
+          navController.navigate(AppScreens.ChannelListScreen.name)
+     //                   val mapper2 = jacksonObjectMapper()
+//                        Log.d("TAG", "HorizontalScrollableComponentAllList: viewModel.filteredListBarnItemDB.value ${viewModel.filteredListBarnItemDB.value}")
+//                        try{
+//    // create an instance of DefaultPrettyPrinter
+//                             val writer = mapper2.writer( DefaultPrettyPrinter());
+//
+//    // convert book object to JSON file
+//  //writer.writeValue(Paths.get("book.json").toFile(), book);
+//
+//                            val myJson= writer.writeValueAsString(filteredListBarnItemDb)
+//   // val obj: List<BarnItemDB> = mapper2.readValue(str)
+//                            val file = File(context.filesDir, "list.json") // unresolved reference to context als
+//                            file.writeText(myJson)
+//
+//       -                    Log.d("testos", "HorizontalScrollableComponentAllList: json $myJson ")
+//                            Log.d("testos", "HorizontalScrollableComponentAllList: path ${file.absolutePath} ")
+//                            Log.d("testos", "HorizontalScrollableComponentAllList: fromFile ${file.readText()} ")
+//
+//} catch ( ex:Exception) {
+//                        ex.printStackTrace();
+//                    }
 
                     }
                 )
@@ -410,7 +418,7 @@ fun OllListArea(
 
 
     // val listBarnItemDB = viewModel.favList. collectAsState(mutableListOf()).value
-    HorizontalScrollableComponentAllList(listOfNameBarnItemList, time = time, onLongPressed = {
+    HorizontalScrollableComponentAllList(navController,listOfNameBarnItemList, time = time, onLongPressed = {
         homeViewModel.getNameBarnItemListFromName(it)
         Log.d("test", "OllListArea: $listOfNameBarnItemList ")
         if (!listOfNameBarnItemList.isNullOrEmpty()) {
