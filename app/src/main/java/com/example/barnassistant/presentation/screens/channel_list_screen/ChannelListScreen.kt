@@ -6,23 +6,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.navigation.AppScreens
-import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.detail.CreateButton
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -97,7 +98,22 @@ client: ChatClient,
         ChatTheme {
             Column {
 
-                val list = mutableListOf<String>()
+               // val list = mutableListOf<String>()
+              val list= rememberSaveable{
+                 mutableStateOf(mutableListOf<String>())
+              }
+                val i = rememberSaveable {
+                    mutableStateOf(
+                        (Random.nextInt(2, 99999) * Random.nextInt(
+                            1,
+                            99
+                        )).absoluteValue
+                    )
+                }
+                BarnAppBar(title ="chatik huyatik" , navController =navController,
+                    showProfile = false ,icon = Icons.Default.ArrowBack,){
+                    navController.navigate(AppScreens.HomeScreen.name)
+                }
                 com.example.barnassistant.presentation.components.InputField(valueState = userName,
                     labelId = "enter  name",
                     keyboardType = KeyboardType.Text,
@@ -109,28 +125,23 @@ client: ChatClient,
                         keyboardController?.hide()
                     })
                 CreateButton(
-                    textId = "get",
+ colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF8D5ACC).copy(alpha = 0.7f)),
+                    textId = "create channel",
                     loading = false,
                     validInputs = true
                 ) {
-                    list.addAll(0, userNameList)
+                    list.value.addAll(0, userNameList)
 
                     Log.d("testik", "ChannelListScreen:list $list")
-
+                    client.channel("messaging", "${i.value}")
+                        .create(list.value, emptyMap()).enqueue()
 
                 }
 
-                val i = rememberSaveable {
-                    mutableStateOf(
-                        (Random.nextInt(2, 9999999) * Random.nextInt(
-                            1,
-                            99
-                        )).absoluteValue
-                    )
-                }
 
                 ChannelsScreen(
                     onHeaderAvatarClick = {
+
 
 
                     },
@@ -139,12 +150,12 @@ client: ChatClient,
 
                         Log.d("testik", "ChannelListScreen:${i.value} ")
                         client.channel("messaging", "${i.value}")
-                            .create(list, emptyMap()).enqueue()
+                            .create(list.value, emptyMap()).enqueue()
                         navController.navigate("${AppScreens.MessageListScreen.name}/messaging:${i.value}")
 
                     },
 
-                    isShowingHeader = true,
+                    isShowingHeader = false,
                     title = stringResource(id = R.string.app_name),
                     isShowingSearch = true,
 
@@ -155,6 +166,13 @@ client: ChatClient,
                         Log.d(
                             "TAG",
                             "ChannelListScreen: viewModel.filteredListBarnItemDB.value ${ChannelViewModel.filteredListBarnItemDB.value}"
+                        )
+                        Log.d(
+                            "TAG",
+                            "ChannelListScreen: viewModel.filteredListBarnItemDB.value ${ Log.d(
+                                "TAG",
+                                "ChannelListScreen: commands ${channel.config.commands}"
+                            )}"
                         )
 
                         if (listobj.value.isNotEmpty()) {

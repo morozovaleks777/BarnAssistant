@@ -1,5 +1,6 @@
 package com.example.barnassistant.presentation.navigation
 
+//import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
@@ -12,9 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
-//import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
+import com.example.barnassistant.presentation.screens.channel_list_screen.counter.Counter
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.detail.DetailBarnListScreen
+import com.example.barnassistant.presentation.screens.help.HelpScreen
 import com.example.barnassistant.presentation.screens.home.HomeScreen
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import com.example.barnassistant.presentation.screens.login.LoginScreen
@@ -42,6 +44,12 @@ fun AppNavigation() {
         }
         composable(AppScreens.LoginScreen.name) {
             LoginScreen(navController = navController)
+        }
+        composable(AppScreens.HelpScreen.name) {
+            HelpScreen(navController = navController)
+        }
+        composable(AppScreens.Counter.name) {
+           Counter(navController = navController)
         }
 
 //        composable(AppScreens.DetailScreen.name) {

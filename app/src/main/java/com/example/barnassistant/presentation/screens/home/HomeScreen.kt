@@ -3,43 +3,41 @@ package com.example.barnassistant.presentation.screens.home
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
-import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelViewModel
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.module.kotlin.*
 import com.google.firebase.auth.FirebaseAuth
-import java.io.File
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -55,25 +53,55 @@ fun HomeScreen(
     val isSearchIconClicked = remember {
         mutableStateOf(false)
     }
-    Scaffold(topBar = {
-        BarnAppBar(title = "Barn Assistant", navController = navController,
-            onSearchClicked = {
-                isSearchIconClicked.value = (!isSearchIconClicked.value)
-            })
-    },
-        floatingActionButton = {
-            FABContent {
-                navController.navigate(AppScreens.DetailScreen.name + "/${listName.value}")
-            }
 
-        }) {
+    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    val scope = rememberCoroutineScope()
+
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerBackgroundColor = colorResource(id = R.color.purple_200),
+
+        drawerContent = {
+            Drawer(scope = scope, scaffoldState = scaffoldState, navController = navController)
+        },
+
+        topBar = {
+                       BarnAppBar(title = "Barn Assistant", navController = navController,
+            onSearchClicked = {
+                       isSearchIconClicked.value = (!isSearchIconClicked.value) }) },
+            floatingActionButton = {
+                Spacer(modifier = Modifier.padding(3.dp))
+                        FABContent {
+                                   navController.navigate(AppScreens.DetailScreen.name + "/${listName.value}") } },
+
+
+
+
+
+
+    )
+
+
+
+
+
+    {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
 
-            HomeContent(
+
+
+
+
+
+
+
+
+            HomeContent(scope,scaffoldState,
                 navController,
                 viewModel,
                 detailViewModel,
@@ -90,11 +118,15 @@ fun HomeScreen(
 @ExperimentalComposeUiApi
 @Composable
 fun HomeContent(
+    scope:CoroutineScope,
+    scaffoldState: ScaffoldState,
     navController: NavController,
     viewModel: HomeScreenViewModel,
     detailViewModel: BarnItemViewModel,
     isSearchIconClicked: Boolean
 ) {
+
+
 
     val listOfNameBarnItemList: List<NameBarnItemList> =
         viewModel._nameList.collectAsState(listOf()).value
@@ -114,9 +146,28 @@ fun HomeContent(
         Modifier.padding(2.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        Row(modifier = Modifier.align(alignment = Alignment.Start)) {
+        Row(modifier = Modifier.align(alignment = Alignment.Start), verticalAlignment = Alignment.CenterVertically) {
             //  TitleSection(label = "Your reading \n " + " activity right now...")
-            Spacer(modifier = Modifier.fillMaxWidth(0.7f))
+//           Spacer(modifier = Modifier.fillMaxWidth(0.7f))
+
+            Icon(imageVector = Icons.Filled.Menu,
+                contentDescription = "search Icon",
+                modifier = Modifier
+                    .scale(2f)
+                    .padding(start = 20.dp)
+                    .clickable {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+
+                    }
+                , tint = Color(0xFF8D5ACC).copy(alpha = 0.7f))
+
+
+
+
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.6f))
             Column {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
@@ -131,8 +182,9 @@ fun HomeContent(
                     text = currentUserName!!,
                     modifier = Modifier.padding(2.dp),
                     style = MaterialTheme.typography.overline,
-                    color = Color.Red,
-                    fontSize = 15.sp,
+                    color = Color(0xFF223D02),
+                    fontFamily = FontFamily.Cursive,
+                    fontSize = 20.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Clip
                 )
@@ -166,16 +218,18 @@ fun HomeContent(
             navController = navController, detailViewModel, homeViewModel = viewModel
         )
 
-        TitleSection(label = "Last opened list")
+        TitleSection(label = "Last opened list", modifier = Modifier.heightIn(30.dp)
+        )
 
         LastOpenedListArea(
             time = time.value, listOfBooks = listOfNameBarnItemList,
             navController = navController, detailViewModel, homeViewModel = viewModel
         )
-        TitleSection(label = "Previous  Lists")
+        TitleSection(label = "Previous  Lists", modifier = Modifier.heightIn(30.dp))
 
         if (nameOfList != null) {
             OllListArea(
+
                 nameOfList = nameOfList,
                 time = nameOfList.createdTime,
                 listOfNameBarnItemList = listOfNameBarnItemList,
@@ -191,51 +245,12 @@ fun HomeContent(
 }
 
 
-//@Composable
-//fun HorizontalScrollableComponentAllList(listOfBooks: List<String>,
-//                                         viewModel: HomeScreenViewModel = hiltViewModel(),
-//                                         time:String ="",
-//                                         onCardPressed: (String) -> Unit,
-//
-//                                         ) {
-//    val scrollState = rememberScrollState()
-//
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .heightIn(280.dp)
-//            .horizontalScroll(scrollState)
-//    ) {
-//
-//            if (listOfBooks.isNullOrEmpty()) {
-//                Surface(modifier = Modifier.padding(23.dp)) {
-//                    Text(
-//                        text = "No list found. Add a List",
-//                        style = TextStyle(
-//                            color = Color.Red.copy(alpha = 0.4f),
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 14.sp
-//                        )
-//                    )
-//
-//                }
-//            } else {
-//
-//                for (book in listOfBooks) {
-//                    ListCard( modifier =Modifier.width(202.dp) ,book, time = time) {
-//                      onCardPressed(it)
-//
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
-//fun HorizontalScrollableComponentAllList(nameOfList: NameBarnItemList,listOfBooks: List<NameBarnItemList>,
+
 fun HorizontalScrollableComponentAllList(
     navController: NavController,
     listOfBooks: List<NameBarnItemList>,
@@ -251,7 +266,7 @@ fun HorizontalScrollableComponentAllList(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(280.dp)
+            .heightIn(180.dp, 230.dp)
             .horizontalScroll(scrollState)
     ) {
 
@@ -334,18 +349,21 @@ fun HorizontalScrollableComponentLastList(
     Row(
         modifier
             .fillMaxWidth()
-            .heightIn(280.dp)
+            .heightIn(max = 180.dp)
             .horizontalScroll(scrollState)
     ) {
 
         if (listOfListsName.isNullOrEmpty()) {
-            Surface(modifier = Modifier.padding(23.dp)) {
+            Surface(modifier = Modifier.padding(10.dp)) {
                 Text(
+
                     text = "No list found. Search a List",
+                    modifier.heightIn(30.dp),
                     style = TextStyle(
                         color = Color.Red.copy(alpha = 0.4f),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily.Cursive
                     )
                 )
 
@@ -386,7 +404,8 @@ fun LastOpenedListArea(
 
     HorizontalScrollableComponentLastList(
         modifier = Modifier
-            .height(120.dp), listOfBooks, time = time
+           .heightIn(max=120.dp)
+        , listOfBooks, time = time
     ) {
 
         homeViewModel.getNameBarnItemListFromName(it)

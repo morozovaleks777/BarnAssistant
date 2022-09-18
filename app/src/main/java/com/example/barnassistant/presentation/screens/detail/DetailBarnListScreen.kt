@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -300,6 +301,7 @@ fun EditForm(
             })
 
         CreateButton(
+           colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF8D5ACC).copy(alpha = 0.7f)),
             textId = when (itemId.value == 0) {
                 true -> "Create "
                 else -> "Edit"
@@ -360,14 +362,17 @@ fun EditForm(
 
 @Composable
 fun CreateButton(
+    colors: ButtonColors,
+    modifier: Modifier=Modifier,
     textId: String,
     loading: Boolean,
     validInputs: Boolean,
     onClick: () -> Unit
 ) {
     Button(
+        colors=colors,
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .padding(3.dp)
             .fillMaxWidth(),
         enabled = validInputs,

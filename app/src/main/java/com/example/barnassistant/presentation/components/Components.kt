@@ -28,12 +28,17 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -46,18 +51,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
+import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppLogo(modifier: Modifier = Modifier) {
     Text(text = "Barn Assistant",
         modifier = modifier.padding(bottom = 16.dp),
         style = MaterialTheme.typography.h3,
-        color = Color.Red.copy(alpha = 0.5f))
+        color = Color(0xFF8D5ACC).copy(alpha = 0.7f),
+
+        fontFamily = FontFamily.Cursive)
 }
 
 
@@ -166,8 +180,14 @@ fun BarnAppBar(
 ) {
 
     TopAppBar(title = {
+
+
+
+
         Row(verticalAlignment = Alignment.CenterVertically){
             if (showProfile) {
+
+
                 Icon(imageVector = Icons.Default.Search,
                     contentDescription = "search Icon",
                     modifier = Modifier
@@ -176,10 +196,8 @@ fun BarnAppBar(
                         .clickable {
                             onSearchClicked.invoke()
                         }
-
-
                 )
-
+               
             }
             if (icon != null) {
                 Icon(imageVector = icon, contentDescription = "arrow back",
@@ -188,15 +206,22 @@ fun BarnAppBar(
             }
             Spacer(modifier = Modifier.width(40.dp) )
             Text(text = title,
-                color = Color.Red.copy(alpha = 0.7f),
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp))
+                color = Color(0xFF8D5ACC).copy(alpha = 0.7f),
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 40.sp),
+                fontFamily = FontFamily.Cursive
+            )
 
 
         }
 
 
     },
+
+
+
+
         actions = {
+
             IconButton(onClick = {
                 FirebaseAuth.getInstance()
                     .signOut().run {
@@ -223,10 +248,12 @@ fun BarnAppBar(
 fun FABContent(onTap: () -> Unit) {
     FloatingActionButton(onClick = { onTap()},
         shape = RoundedCornerShape(50.dp),
-        backgroundColor = Color(0xFF92CBDF)) {
-        Icon(imageVector = Icons.Default.Add,
-            contentDescription = "Add a Book",
-            tint = Color.White)
+        backgroundColor = Color(0xFF92CBDF),
+    ) {
+//        Icon(imageVector = Icons.Default.Add,
+//            contentDescription = "Add a Book",
+//            tint = Color.White)
+        Text("add new list")
 
     }
 
@@ -269,10 +296,14 @@ fun NoteRow(
                 onNoteClicked(barnItem)
 
             }
-            .background(color=when(barnItem.enabled) {
-                true -> Color(0xFFBB86FC)
-                false -> {Color(0xFF9797BB)
-                }})
+            .background(
+                color = when (barnItem.enabled) {
+                    true -> Color(0xFFBB86FC)
+                    false -> {
+                        Color(0xFF9797BB)
+                    }
+                }
+            )
             .padding(horizontal = 14.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.Start) {
             Text(
@@ -479,16 +510,23 @@ fun ListCard(
                     val isStartedReading = remember {
                         mutableStateOf(false)
                     }
-
+val viewModel:BarnItemViewModel= hiltViewModel()
+                    val list=viewModel.favList.collectAsState().value.filter { barnItemDB -> barnItemDB.listName==book }
                     Row(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.Bottom
                     ) {
-                        //  isStartedReading.value = book.startedReading != null
+                       val bool=list.any { barnItemDB -> barnItemDB.enabled }
+                         isStartedReading.value =when(bool){
+                             true ->false
+                             false ->true
+                         }
 
 
                         RoundedButton(label = if (isStartedReading.value)  "Done" else "Not Yet done",
-                            radius = 70)
+                            radius = 70){
+                            isStartedReading.value=!isStartedReading.value
+                        }
 
                     }
                 }
@@ -534,9 +572,11 @@ fun TitleSection(modifier: Modifier = Modifier,
     Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
         Column {
             Text(text = label,
-                fontSize = 19.sp,
+                fontSize = 40.sp,
                 fontStyle = FontStyle.Normal,
-                textAlign = TextAlign.Left)
+                textAlign = TextAlign.Left,
+            color = Color(0xFF8BC34A),
+            fontFamily = FontFamily.Cursive,)
         }
 
     }
@@ -569,82 +609,93 @@ fun LazyColumnBarnItemDB(
 
 
                     }
-                    //  it != DismissValue.DismissedToEnd
+
                     false
 
                 }
             )
-            SwipeToDismiss(
-                state = dismissState,
-                modifier = Modifier.padding(vertical = 4.dp),
-                directions = setOf(
-                    DismissDirection.StartToEnd,
-                    DismissDirection.EndToStart
+            SwipeToDismiss(dismissState, it, viewModel)
+        }
+    }
+}
+
+@ExperimentalMaterialApi
+@Composable
+private fun SwipeToDismiss(
+    dismissState: DismissState,
+    it: BarnItemDB,
+    viewModel: BarnItemViewModel
+) {
+    SwipeToDismiss(
+        state = dismissState,
+        modifier = Modifier.padding(vertical = 4.dp),
+        directions = setOf(
+            DismissDirection.StartToEnd,
+            DismissDirection.EndToStart
+        ),
+        dismissThresholds = { direction ->
+            FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
+        },
+        background = {
+            val direction =
+                dismissState.dismissDirection ?: return@SwipeToDismiss
+            val color by animateColorAsState(
+                when (dismissState.targetValue) {
+                    DismissValue.Default -> Color.Unspecified
+                    DismissValue.DismissedToEnd -> Color.Green
+                    DismissValue.DismissedToStart -> Color.Red
+                }
+            )
+            val alignment = when (direction) {
+                DismissDirection.StartToEnd -> Alignment.CenterStart
+                DismissDirection.EndToStart -> Alignment.CenterEnd
+            }
+            val icon = when (direction) {
+                DismissDirection.StartToEnd -> Icons.Default.Done
+                DismissDirection.EndToStart -> {
+                    Icons.Default.Delete
+                }
+
+
+            }
+            val scale by animateFloatAsState(
+                if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+            )
+
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 20.dp),
+                contentAlignment = alignment
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.scale(scale)
+                )
+            }
+        },
+        dismissContent = {
+
+            NoteRow(
+                barnItem = BarnItemDB(
+                    name = it.name,
+                    count = it.count,
+                    price = it.price,
+                    itemId = it.itemId,
+                    listName = it.listName,
+                    enabled = it.enabled
                 ),
-                dismissThresholds = { direction ->
-                    FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
-                },
-                background = {
-                    val direction =
-                        dismissState.dismissDirection ?: return@SwipeToDismiss
-                    val color by animateColorAsState(
-                        when (dismissState.targetValue) {
-                            DismissValue.Default -> Color.Unspecified
-                            DismissValue.DismissedToEnd -> Color.Green
-                            DismissValue.DismissedToStart -> Color.Red
-                        }
-                    )
-                    val alignment = when (direction) {
-                        DismissDirection.StartToEnd -> Alignment.CenterStart
-                        DismissDirection.EndToStart -> Alignment.CenterEnd
-                    }
-                    val icon = when (direction) {
-                        DismissDirection.StartToEnd -> Icons.Default.Done
-                        DismissDirection.EndToStart -> {
-                            Icons.Default.Delete
-                        }
-
-
-                    }
-                    val scale by animateFloatAsState(
-                        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
-                    )
-
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(color)
-                            .padding(horizontal = 20.dp),
-                        contentAlignment = alignment
-                    ) {
-                        Icon(
-                            icon,
-                            contentDescription = "Localized description",
-                            modifier = Modifier.scale(scale)
-                        )
-                    }
-                },
-                dismissContent = {
-
-                    NoteRow(
-                        barnItem = BarnItemDB(
-                            name = it.name,
-                            count = it.count,
-                            price = it.price,
-                            itemId = it.itemId,
-                            listName = it.listName,
-                           enabled = false
-
-                        ),
-                        name = it.name,
-                        count = it.count.toString(),
-                        price = it.price.toString(),
-                        sum = viewModel.getItemSum(it),
-                        stringSum = when (it.count <= 1) {
-                            true -> ""
-                            else -> "sum :"
-                        }
-                    ) {
+                name = it.name,
+                count = it.count.toString(),
+                price = it.price.toString(),
+                sum = viewModel.getItemSum(it),
+                stringSum = when (it.count <= 1) {
+                    true -> ""
+                    else -> "sum :"
+                }
+            ) {
 //                        name.value = it.name
 //                        count.value = it.count.toString()
 //                        price.value = it.price.toString()
@@ -652,15 +703,13 @@ fun LazyColumnBarnItemDB(
 //                        listName.value = it.listName
 
 
-                        viewModel.changeEnableState(it)
-                        Log.d("test", "DetailBarnListScreen: $it ")
-                    }
-                })
-        }
-    }
+                viewModel.changeEnableState(it)
+
+            }
+        })
 }
 
-@OptIn(ExperimentalMaterialApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ButtonWithLongPress(
     onClick: () -> Unit,
@@ -725,4 +774,152 @@ fun ButtonWithLongPress(
             }
         }
     }}
+
+
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController) {
+    val items = listOf(
+        NavDrawerItem.Home,
+        NavDrawerItem.Help,
+       NavDrawerItem.Counter,
+
+    )
+    Column(
+        modifier = Modifier
+           // .background(colorResource(id = R.color.purple_200))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFB9DCE9),
+                        Color(0xFFCD1FEB)
+
+                    )
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+    ) {
+        // Header
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_background),
+            contentDescription = R.drawable.ic_launcher_background.toString(),
+            modifier = Modifier
+                .height(100.dp)
+                .fillMaxWidth()
+                .padding(10.dp)
+        )
+        // Space between
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+        )
+        // List of navigation items
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        items.forEach { item ->
+            DrawerItem(item = item, selected = currentRoute == item.route, onItemClick = {
+                navController.navigate(item.route) {
+                    // Pop up to the start destination of the graph to
+                    // avoid building up a large stack of destinations
+                    // on the back stack as users select items
+                    navController.graph.startDestinationRoute?.let { route ->
+                        popUpTo(route) {
+                            saveState = true
+                        }
+                    }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
+                }
+                // Close drawer
+                scope.launch {
+                    scaffoldState.drawerState.close()
+                }
+            })
+
+            /* Add code later */
+
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            fontFamily = FontFamily.Cursive,
+            text = "Developed by Oleksandr Morozov",
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(12.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+
+
+sealed class NavDrawerItem(var route: String,val icon:ImageVector, var title: String) {
+    object Home : NavDrawerItem(AppScreens.HomeScreen.name,Icons.Filled.Home, "Home")
+    object Help : NavDrawerItem(AppScreens.HelpScreen.name, Icons.Filled.Help,"Help")
+    object Counter : NavDrawerItem(AppScreens.Counter.name,Icons.Filled.Calculate,  "Counter")
+
+}
+@Composable
+fun DrawerItem(item: NavDrawerItem, selected: Boolean, onItemClick: (NavDrawerItem) -> Unit) {
+    val background = if (selected) R.color.purple_700 else android.R.color.transparent
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onItemClick(item) })
+            .height(45.dp)
+            //.background(colorResource(id = background))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White,
+                        colorResource(id = R.color.purple_200)
+                    )
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+            .padding(start = 10.dp)
+    ) {
+//        Image(
+//            painter = painterResource(id =item.icon),
+//            contentDescription = item.title,
+//            colorFilter = ColorFilter.tint(Color.White),
+//            contentScale = ContentScale.Fit,
+//            modifier = Modifier
+//                .height(35.dp)
+//                .width(35.dp)
+//        )
+        Icon(imageVector = item.icon,
+            contentDescription = "search Icon",
+            modifier = Modifier
+                .scale(2f)
+                .padding(start = 20.dp)
+
+            , tint = Color.White)
+        Spacer(modifier = Modifier.fillMaxWidth(0.6f))
+        Text(
+
+            text = item.title,
+            fontSize = 35.sp,
+            color = Color.White,
+            fontFamily = FontFamily.Cursive,
+       fontWeight = FontWeight.Bold
+        )
+    }
+}
 
