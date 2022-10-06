@@ -1,10 +1,12 @@
 package com.example.barnassistant.presentation.screens.update_screen
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -39,6 +41,7 @@ updateScreenViewModel: UpdateScreenViewModel){
     val count = rememberSaveable { mutableStateOf("") }
     val price = rememberSaveable { mutableStateOf("") }
     val itemId = rememberSaveable { mutableStateOf(0) }
+    val sum= rememberSaveable { mutableStateOf(0f) }
 
 
     val listBarnItemDB = detailHViewModel.favList.collectAsState().value.filter {
@@ -68,17 +71,24 @@ updateScreenViewModel: UpdateScreenViewModel){
             }
 
         }) {
-        Surface(modifier = Modifier.fillMaxSize().padding(it)) {
+        Surface(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
           //  HomeContent(navController, viewModel,detailViewModel)
-            LazyColumnBarnItemDB(
-                listBarnItemDB =listBarnItemDB ,
-                viewModel =detailHViewModel ,
-                name = name,
-                count = count,
-                price = price,
-                itemId =itemId ,
-                listName =listName
-            )
+            Column() {
+                LazyColumnBarnItemDB(
+                    listBarnItemDB =listBarnItemDB ,
+                    viewModel =detailHViewModel ,
+                    name = name,
+                    count = count,
+                    price = price,
+                    itemId =itemId ,
+                    listName =listName
+                )
+                sum.value=       detailHViewModel.getAmount(listBarnItemDB)
+
+                Text(text = "${sum.value}")
+            }
         }
     }
 }

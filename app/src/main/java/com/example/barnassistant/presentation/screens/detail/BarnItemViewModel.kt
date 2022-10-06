@@ -3,12 +3,7 @@ package com.example.barnassistant.presentation.screens.detail
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,15 +16,12 @@ import com.example.barnassistant.domain.useCases.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @HiltViewModel
 
@@ -41,7 +33,7 @@ class BarnItemViewModel @Inject constructor(
     private val getBarnListUseCase: GetBarnListUseCase,
     private val deleteBarnItemUseCase: DeleteBarnItemUseCase,
     private val barnListMapper: BarnListMapper,
-
+private  val getamountofexpensesusecase: GetAmountOfExpensesUseCase
 ): ViewModel() {
 
 
@@ -212,6 +204,9 @@ val mapper= jacksonObjectMapper()
             val newItem = barnItem.copy(enabled =!barnItem.enabled)
             editBarnItemUseCase.editBarnItem(newItem)
         }
+    }
+    fun getAmount(list:List<BarnItemDB>):Float{
+      return  getamountofexpensesusecase.getAmount(list)
     }
 
 }

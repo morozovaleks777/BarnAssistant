@@ -4,6 +4,7 @@ import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Environment.getExternalStorageDirectory
 import android.util.Log
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
@@ -21,13 +22,13 @@ class MyReceiver @Inject constructor(
     private val homeViewModel: HomeScreenViewModel,
     private val utils: Utils
 ) : BroadcastReceiver() {
-
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
             DownloadManager.ACTION_DOWNLOAD_COMPLETE -> {
-                val f = File("/sdcard/Download/", "list.json")
-                val list = f.readText()
-                f.delete()
+
+                val file = File("/sdcard/Download/", "list.json")
+                val list = file.readText()
+                    file.delete()
                 viewModel.receivedList.value = list
                 if (context != null) {
                     viewModel.newListReceived(context, list)

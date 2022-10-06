@@ -2,7 +2,6 @@ package com.example.barnassistant.domain.repository
 
 
 import com.example.barnassistant.data.DataOrException
-import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query

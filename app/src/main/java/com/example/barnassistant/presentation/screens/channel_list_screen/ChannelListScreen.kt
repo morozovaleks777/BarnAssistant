@@ -48,16 +48,20 @@ import kotlin.random.Random
 fun ChannelListScreen(
     navController: NavController,
 client: ChatClient,
+    channelViewModel: ChannelViewModel
 
 ) {
 
     val listobj = rememberSaveable {
         mutableStateOf(listOf<BarnItemDB>())
     }
+
     listobj.value = ChannelViewModel.filteredListBarnItemDB.collectAsState().value
+
     val userName = rememberSaveable {
         mutableStateOf("")
     }
+
     val messageId = rememberSaveable {
         mutableStateOf(0)
     }
@@ -98,7 +102,7 @@ client: ChatClient,
         ChatTheme {
             Column {
 
-               // val list = mutableListOf<String>()
+
               val list= rememberSaveable{
                  mutableStateOf(mutableListOf<String>())
               }
@@ -181,6 +185,7 @@ client: ChatClient,
                             val writer = mapper.writer(DefaultPrettyPrinter())
                             val str = writer.writeValueAsString(listobj.value)
                             val file = File(context.filesDir, "list.json")
+
                             file.createNewFile()
 
                             file.writeText(str)
@@ -211,21 +216,23 @@ client: ChatClient,
                                 upload = file,
 
                                 )
-
+                          val listName=listobj.value[0].listName
+                          val   messageText="send you list of items \"$listName\""
                             val message2 = Message(
                                 cid = channel.cid,
                                 attachments = mutableListOf(attachment),
                                 id = messageId.toString(),
-                                text = "send you list of items",
+                                text = messageText,
                                 extraData = mutableMapOf("listJson" to str)
                             )
-                            if (listobj.value.isNotEmpty()) {
+                            if (listobj.value.isNotEmpty() && ChannelViewModel.isNeedSendFile.value) {
                                 channelClient.sendMessage(message2).enqueue {
                                     if (it.isSuccess) {
                                         ++messageId.value
                                         it.data()
                                         file.delete()
                                         listobj.value = emptyList()
+                                       ChannelViewModel.isNeedSendFile.value=false
                                     }
                                     Log.d(
                                         "tust",
@@ -239,6 +246,7 @@ client: ChatClient,
                                     it.isSuccess
 
                                 }
+
                             }
 
                             Log.d("tust", "ChannelListScreen: ${context.fileList().toList()}")

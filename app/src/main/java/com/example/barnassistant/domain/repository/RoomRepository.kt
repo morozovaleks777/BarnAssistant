@@ -15,7 +15,7 @@ interface RoomRepository {
 suspend fun deleteBarnItemList(name:Int)
         suspend fun deleteBarnItem(barnItem: BarnItem)
         suspend fun editBarnItem(barnItem: BarnItemDB)
-        fun getAmount(list: List<BarnItem>):Float
+        fun getAmount(list: List<BarnItemDB>):Float
         suspend fun getBarnItem(ItemId: Int): BarnItemDB
         fun getBarnItemDBList(): Flow<List<BarnItemDB>>
         suspend fun addBarnItem(barnItem: BarnItem)

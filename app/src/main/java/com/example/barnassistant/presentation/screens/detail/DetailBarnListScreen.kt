@@ -40,6 +40,7 @@ fun DetailBarnListScreen(
     homeViewModel: HomeScreenViewModel= hiltViewModel(),
     curName:String=""
 ) {
+    val sum= rememberSaveable { mutableStateOf(0f) }
     val listName = rememberSaveable { mutableStateOf(curName) }
     val name = rememberSaveable { mutableStateOf("") }
     val count = rememberSaveable { mutableStateOf("") }
@@ -93,12 +94,14 @@ fun DetailBarnListScreen(
                     itemId,
                     listName
                 )
+                sum.value=viewModel.getAmount(listBarnItemDB)
+                Text(text = "${sum.value}")
             }
         }
     }
 }
 
-//@ExperimentalMaterialApi
+//@ExperimentalMate"rialApi
 //@Composable
 //private fun LazyColumnBarnItemDB(
 //    listBarnItemDB: List<BarnItemDB>,

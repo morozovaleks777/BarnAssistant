@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
+import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelViewModel
 import com.example.barnassistant.presentation.screens.channel_list_screen.counter.Counter
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.detail.DetailBarnListScreen
@@ -89,8 +90,10 @@ fun AppNavigation() {
     val channelListName = AppScreens.ChannelListScreen.name
 
         composable(channelListName) {
-          ChannelListScreen(navController = navController, client = ChatClient.instance() )
+            val viewModel = hiltViewModel<ChannelViewModel>()
+          ChannelListScreen(navController = navController, client = ChatClient.instance() , viewModel)
         }
+
         val messageListName = AppScreens.MessageListScreen.name
         composable("$messageListName/{cid}") { backStackEntry ->
             MessageListScreen(

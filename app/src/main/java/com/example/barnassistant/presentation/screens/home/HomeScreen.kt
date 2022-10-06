@@ -3,12 +3,16 @@ package com.example.barnassistant.presentation.screens.home
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -34,7 +38,6 @@ import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelViewModel
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
-import com.fasterxml.jackson.module.kotlin.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -73,41 +76,20 @@ fun HomeScreen(
             floatingActionButton = {
                 Spacer(modifier = Modifier.padding(3.dp))
                         FABContent {
-                                   navController.navigate(AppScreens.DetailScreen.name + "/${listName.value}") } },
-
-
-
-
-
-
-    )
-
-
-
-
-
-    {
+                                   navController.navigate(AppScreens.DetailScreen.name + "/${listName.value}") }
+                                   },
+        ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
 
-
-
-
-
-
-
-
-
             HomeContent(scope,scaffoldState,
                 navController,
                 viewModel,
                 detailViewModel,
-                isSearchIconClicked = isSearchIconClicked.value
-            )
-
+                isSearchIconClicked = isSearchIconClicked.value)
         }
     }
 }
@@ -147,8 +129,6 @@ fun HomeContent(
         verticalArrangement = Arrangement.Top
     ) {
         Row(modifier = Modifier.align(alignment = Alignment.Start), verticalAlignment = Alignment.CenterVertically) {
-            //  TitleSection(label = "Your reading \n " + " activity right now...")
-//           Spacer(modifier = Modifier.fillMaxWidth(0.7f))
 
             Icon(imageVector = Icons.Filled.Menu,
                 contentDescription = "search Icon",
@@ -159,13 +139,8 @@ fun HomeContent(
                         scope.launch {
                             scaffoldState.drawerState.open()
                         }
-
                     }
                 , tint = Color(0xFF8D5ACC).copy(alpha = 0.7f))
-
-
-
-
 
             Spacer(modifier = Modifier.fillMaxWidth(0.6f))
             Column {
@@ -199,31 +174,27 @@ fun HomeContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-            ) { searchQuery ->
-                Log.d("test", "HomeContent: $searchQuery")
-                Log.d("test", "HomeContent: $listOfNameBarnItemList")
-                //  viewModel.searchBooks(query = searchQuery)
-                filteredListOfNameBarnItemList.value =
+            ) { searchQuery -> filteredListOfNameBarnItemList.value =
                     listOfNameBarnItemList.filter {
                         it.name == searchQuery
-
                     }
-
-                Log.d("test", "HomeContent: listOfBarnItemDB2 $filteredListOfNameBarnItemList")
             }
         }
 
         LastOpenedListArea(
-            time = time.value, listOfBooks = filteredListOfNameBarnItemList.value,
-            navController = navController, detailViewModel, homeViewModel = viewModel
-        )
+            time = time.value,
+            listOfBooks = filteredListOfNameBarnItemList.value,
+            navController = navController, detailViewModel,
+            homeViewModel = viewModel)
 
-        TitleSection(label = "Last opened list", modifier = Modifier.heightIn(30.dp)
-        )
+        TitleSection(label = "Last opened list",
+            modifier = Modifier.heightIn(30.dp))
 
         LastOpenedListArea(
-            time = time.value, listOfBooks = listOfNameBarnItemList,
-            navController = navController, detailViewModel, homeViewModel = viewModel
+            time = time.value,
+            listOfBooks = listOfNameBarnItemList,
+            navController = navController, detailViewModel,
+            homeViewModel = viewModel
         )
         TitleSection(label = "Previous  Lists", modifier = Modifier.heightIn(30.dp))
 
@@ -235,13 +206,9 @@ fun HomeContent(
                 listOfNameBarnItemList = listOfNameBarnItemList,
                 navController = navController,
                 viewModel = detailViewModel,
-                homeViewModel = viewModel
-            )
+                homeViewModel = viewModel)
         }
-
-
     }
-
 }
 
 
@@ -262,7 +229,7 @@ fun HorizontalScrollableComponentAllList(
 
     ) {
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
+   // val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,29 +265,9 @@ fun HorizontalScrollableComponentAllList(
                         val filteredListBarnItemDb=viewModel._roomBarnList.value.filter { barnItemDB ->
                             barnItemDB.listName==book.name }
                         ChannelViewModel.filteredListBarnItemDB.value=filteredListBarnItemDb
-
+ChannelViewModel.isNeedSendFile.value=true
           navController.navigate(AppScreens.ChannelListScreen.name)
-     //                   val mapper2 = jacksonObjectMapper()
-//                        Log.d("TAG", "HorizontalScrollableComponentAllList: viewModel.filteredListBarnItemDB.value ${viewModel.filteredListBarnItemDB.value}")
-//                        try{
-//    // create an instance of DefaultPrettyPrinter
-//                             val writer = mapper2.writer( DefaultPrettyPrinter());
-//
-//    // convert book object to JSON file
-//  //writer.writeValue(Paths.get("book.json").toFile(), book);
-//
-//                            val myJson= writer.writeValueAsString(filteredListBarnItemDb)
-//   // val obj: List<BarnItemDB> = mapper2.readValue(str)
-//                            val file = File(context.filesDir, "list.json") // unresolved reference to context als
-//                            file.writeText(myJson)
-//
-//       -                    Log.d("testos", "HorizontalScrollableComponentAllList: json $myJson ")
-//                            Log.d("testos", "HorizontalScrollableComponentAllList: path ${file.absolutePath} ")
-//                            Log.d("testos", "HorizontalScrollableComponentAllList: fromFile ${file.readText()} ")
-//
-//} catch ( ex:Exception) {
-//                        ex.printStackTrace();
-//                    }
+
 
                     }
                 )
@@ -435,8 +382,6 @@ fun OllListArea(
     val listBarnItemDB = viewModel.favList.collectAsState().value
     viewModel.getBarnItemList()
 
-
-    // val listBarnItemDB = viewModel.favList. collectAsState(mutableListOf()).value
     HorizontalScrollableComponentAllList(navController,listOfNameBarnItemList, time = time, onLongPressed = {
         homeViewModel.getNameBarnItemListFromName(it)
         Log.d("test", "OllListArea: $listOfNameBarnItemList ")

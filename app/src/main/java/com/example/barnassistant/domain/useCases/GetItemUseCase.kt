@@ -5,7 +5,7 @@ import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.repository.RoomRepository
 import javax.inject.Inject
 
-class getItemUseCase  @Inject constructor(private  val barnListRepository: RoomRepository) {
+class GetItemUseCase  @Inject constructor(private  val barnListRepository: RoomRepository) {
     suspend fun getBarnItem(itemId: Int): Resource<BarnItemDB> {
         return barnListRepository.getItem(itemId)
     }

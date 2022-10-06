@@ -1,10 +1,7 @@
 package com.example.barnassistant.data.room
 
 
-import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.data.DataOrException
 import com.example.barnassistant.data.Resource
@@ -13,13 +10,8 @@ import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.domain.repository.RoomRepository
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -44,7 +36,7 @@ class RoomRepositoryImpl @Inject constructor (
 
     }
 
-    override fun getAmount(list: List<BarnItem>): Float {
+    override fun getAmount(list: List<BarnItemDB>): Float {
         var sum = 0F
 
         for (i in list.indices) {
