@@ -329,11 +329,11 @@ fun EditForm(
                     homeViewModel.getTime()
                     time.value=homeViewModel.time.value
                     Log.d("test", "EditForm: after ${time.value}")
-                    if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value, createdTime = "Time :${time.value}"))) {
+                    if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value, createdTime = "${time.value}"))) {
                         homeViewModel.addNameBarnItemList(
                             NameBarnItemList(
                                 name = listName.value,
-                                createdTime = "Time :${time.value}"
+                                createdTime = "${time.value}"
                             )
                         )
                         Log.d("test", "EditForm: $list")

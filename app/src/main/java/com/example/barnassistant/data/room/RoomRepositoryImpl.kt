@@ -32,7 +32,7 @@ class RoomRepositoryImpl @Inject constructor (
 
     override suspend fun editBarnItem(barnItem: BarnItemDB) {
         barnListDao.addBarnItem(barnItem)
-       // barnListDao.editBarnItem(barnItem)
+
 
     }
 
@@ -46,22 +46,10 @@ class RoomRepositoryImpl @Inject constructor (
         return sum
     }
 
-//    override suspend fun getBarnItem(itemId: Int): BarnItem {
-//        val barnItemDB = barnListDao.getBarnItem(itemId)
-//        return mapper.mapBarnDBToBarnItem(barnItemDB)
-//    }
     override suspend fun getBarnItem(itemId: Int): BarnItemDB {
         val barnItemDB = barnListDao.getBarnItem(itemId)
         return barnItemDB
     }
-
-
-
-    //    override fun getBarnList(): LiveData<List<BarnItemDB>> =barnListDao.getBarnItemList()
-////        Transformations.map(barnListDao.getBarnItemList()) {
-////            mapper.mapListBarnItemDBToListBarnItem(it)
-////            barnListDao.getBarnItemList().value
-////        }
 
     override  fun getBarnItemDBList(): Flow<List<BarnItemDB>> = barnListDao.getBarnList()
 

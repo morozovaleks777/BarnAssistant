@@ -1,15 +1,11 @@
 package com.example.barnassistant.domain.repository
 
-import androidx.lifecycle.LiveData
 import com.example.barnassistant.data.DataOrException
 import com.example.barnassistant.data.Resource
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.tasks.await
 
 interface RoomRepository {
 suspend fun deleteBarnItemList(name:Int)
@@ -26,8 +22,8 @@ suspend fun getItem(itemId:Int):Resource<BarnItemDB>
 
 suspend fun addName(nameBarnItemList: NameBarnItemList)
 
-//                suspend fun < T>getAllNameBarnItemListFromDatabase(): DataOrException<List< T>, Boolean, Exception>
-
+//                suspend fun < T>getAllNameBarnItemListFromDatabase(): DataOrException<List<T>, Boolean, Exception>
+//
 //                {
 //                        val dataOrException = DataOrException<List<T>, Boolean, Exception>()
 //

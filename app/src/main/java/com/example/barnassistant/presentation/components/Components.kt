@@ -28,11 +28,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -54,8 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
 import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
@@ -536,7 +532,7 @@ val viewModel:BarnItemViewModel= hiltViewModel()
     }
 }
 
-@Preview
+
 @Composable
 fun RoundedButton(
     label: String = "Reading",
@@ -922,4 +918,44 @@ fun DrawerItem(item: NavDrawerItem, selected: Boolean, onItemClick: (NavDrawerIt
         )
     }
 }
+@Preview
+@Composable
+fun FilterCard(
+    modifier: Modifier = Modifier,
+    filterName: String="filter",
+    onClick: () -> Unit={}
+) {
+
+            Card(shape = RoundedCornerShape(size = 29.dp,),
+                backgroundColor = Color.Gray.copy(alpha = 0.3f),
+border = BorderStroke(width = 1.dp,color= Color.Black.copy(alpha = 0.6f)),
+                elevation = -1.dp,
+                modifier = modifier
+
+                    .padding(10.dp)
+                    .height(34.dp)
+                    .widthIn(40.dp)
+                   ) {
+                Row(//horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    Text(text = filterName,
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .height(18.dp)
+                        ,
+
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "closed",
+                            tint = Color.Black.copy(alpha = 0.7f),
+                            modifier = Modifier.clickable { onClick.invoke() })
+                    }
+
+                }
+            }
+
+
 

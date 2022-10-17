@@ -14,7 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelListScreen
 import com.example.barnassistant.presentation.screens.channel_list_screen.ChannelViewModel
-import com.example.barnassistant.presentation.screens.channel_list_screen.counter.Counter
+import com.example.barnassistant.presentation.screens.counter.Counter
+import com.example.barnassistant.presentation.screens.counter.CounterViewModel
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.detail.DetailBarnListScreen
 import com.example.barnassistant.presentation.screens.help.HelpScreen
@@ -50,7 +51,9 @@ fun AppNavigation() {
             HelpScreen(navController = navController)
         }
         composable(AppScreens.Counter.name) {
-           Counter(navController = navController)
+            val viewModel = hiltViewModel<CounterViewModel>()
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+           Counter(navController = navController,viewModel,homeViewModel)
         }
 
 //        composable(AppScreens.DetailScreen.name) {
