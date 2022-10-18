@@ -13,15 +13,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -37,11 +41,13 @@ import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import java.util.*
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun Counter(navController: NavController,
-            viewModel: CounterViewModel= hiltViewModel(),
-            homeViewModel: HomeScreenViewModel = hiltViewModel(),) {
+fun Counter(
+    navController: NavController,
+    viewModel: CounterViewModel = hiltViewModel(),
+    homeViewModel: HomeScreenViewModel = hiltViewModel(),
+) {
     val listBarnItemDB = viewModel.favList.collectAsState().value.filter { barnItemDB ->
         !barnItemDB.enabled
     }
@@ -49,17 +55,21 @@ fun Counter(navController: NavController,
         mutableStateOf(listOf<BarnItemDB>())
     }
     val lisatOfFilters =
-        listOf("All list", "name of list", "all sum", "sum per month", "item sum")
+        listOf("All list", "name of list", "all sum", "sum per period", "item sum")
     var expanded by remember { mutableStateOf(false) }
 
     val currentFilteredList = viewModel.currentFilteredList.collectAsState().value
     val newList = rememberSaveable { currentFilteredList }
     val deletedItemList = remember {
-        mutableStateListOf<String>("All list", "name of list", "all sum", "sum per month", "item sum")
+        mutableStateListOf("All list", "name of list", "all sum", "sum per period", "item sum")
     }
-val isShowCalendar=rememberSaveable { mutableStateOf(false) }
+    val isShowCalendar = rememberSaveable { mutableStateOf(false) }
+    val isShowInputField = rememberSaveable { mutableStateOf(false) }
     val mDateBegin = remember { mutableStateOf("00.00.0000") }
     val mDateLast = remember { mutableStateOf("00.00.0000") }
+    val enteredName = rememberSaveable {
+        mutableStateOf("")
+    }
     val sum = rememberSaveable { mutableStateOf(0f) }
     val listName = rememberSaveable { mutableStateOf("curName") }
     val name = rememberSaveable { mutableStateOf("") }
@@ -110,11 +120,11 @@ val isShowCalendar=rememberSaveable { mutableStateOf(false) }
                         for (item in lisatOfFilters) {
                             DropdownMenuItem(onClick = {
                                 if (deletedItemList.contains(item)) deletedItemList.remove(item)
-                                else
+                                //  else
 
-                                    viewModel.currentFilteredList.value.add(
-                                        item
-                                    )
+                                viewModel.currentFilteredList.value.add(
+                                    item
+                                )
 
                             }) {
                                 Text(text = item)
@@ -144,13 +154,23 @@ val isShowCalendar=rememberSaveable { mutableStateOf(false) }
                         {
                             FilterCard(filterName = it) {
 
-                               deletedItemList.add(it)
-                              if(viewModel.currentFilteredList.value.contains(it)){
-                                viewModel.currentFilteredList.value.remove(
-                                    it
-                                )}
-                                Log.d("Counter",
-                                    "Counter: viewModel.currentFilteredList.value ${viewModel.currentFilteredList.value}")
+                                deletedItemList.add(it)
+                                if (deletedItemList.contains("sum per period")) {
+                                    isShowCalendar.value = false
+                                }
+                                if (deletedItemList.contains("item sum")) {
+                                    isShowInputField.value = false
+                                }
+
+                                if (viewModel.currentFilteredList.value.contains(it)) {
+                                    viewModel.currentFilteredList.value.remove(
+                                        it
+                                    )
+                                }
+                                Log.d(
+                                    "Counter",
+                                    "Counter: viewModel.currentFilteredList.value ${viewModel.currentFilteredList.value}"
+                                )
 
                             }
                         }
@@ -158,8 +178,26 @@ val isShowCalendar=rememberSaveable { mutableStateOf(false) }
 
 
             }
-            if(isShowCalendar.value){
-            MyCalendar(mDateBegin,mDateLast)}else Box() {}
+            if (isShowCalendar.value) {
+                MyCalendar(mDateBegin, mDateLast)
+            } else Box() {}
+            if (isShowInputField.value) {
+                val valState = remember {
+                    mutableStateOf("")
+                }
+                val keyboardController = LocalSoftwareKeyboardController.current
+                com.example.barnassistant.presentation.components.InputField(valueState = valState,
+                    labelId = "enter name",
+                    keyboardType = KeyboardType.Text,
+                    enabled = true,
+                    onAction = KeyboardActions {
+
+
+                        enteredName.value = valState.value
+                        valState.value = ""
+                        keyboardController?.hide()
+                    })
+            }
             Column {
                 Log.d("Counter", "Counter:  currentFilteredList mDateB ${mDateBegin.value} ")
                 Log.d("Counter", "Counter:  currentFilteredList mDataL ${mDateLast.value} ")
@@ -179,20 +217,26 @@ val isShowCalendar=rememberSaveable { mutableStateOf(false) }
 //                        }
                         map.value.put("All list", data)
                     }
+
                     !deletedItemList.contains("name of list") -> {
+                   isShowInputField.value=true
                         filteredListItemDb.value =
-                            listBarnItemDB.filter { barnItemDB -> barnItemDB.listName == "today" }
+                            listBarnItemDB.filter { barnItemDB -> barnItemDB.listName == enteredName.value }
                         val data = viewModel.getAllListWithSum(filteredListItemDb.value)
-                        map.value.put("name of list", data)
+                        if(data!=0f){
+                        map.value.put(enteredName.value, data)}
                     }
+
                     currentFilteredList.contains("all sum") -> {}
 
-                    !deletedItemList.contains("sum per month") -> {
-                        isShowCalendar.value=true
+                    !deletedItemList.contains("sum per period") -> {
+                        isShowCalendar.value = true
                         homeViewModel.getAllBooksFromDatabase()
                         val l =
-                            viewModel.getSumFOrPeriod(homeViewModel._nameList.collectAsState(listOf()).value,
-                                mDateBegin.value,mDateLast.value)
+                            viewModel.getSumFOrPeriod(
+                                homeViewModel._nameList.collectAsState(listOf()).value,
+                                mDateBegin.value, mDateLast.value
+                            )
                         Log.d("Counter", "Counter: l $l ")
                         val l2 = mutableSetOf<String>()
                         for (i in l) {
@@ -205,46 +249,67 @@ val isShowCalendar=rememberSaveable { mutableStateOf(false) }
 //                        if (map.value.isNotEmpty()) {
 //                            map.value = mutableMapOf()
 //                        }
-                        map.value.put("sum per month", data)
+                        if (mDateBegin.value != "00.00.0000" && mDateLast.value != "00.00.0000") {
+                            map.value.put(
+                                "sum from ${mDateBegin.value} till ${mDateLast.value}",
+                                data
+                            )
+                        }
                         Log.d("Counter", "Counter:  map.value ${map.value}")
                     }
-                    currentFilteredList.contains("item sum") -> {}
-                    //   else -> {}
-                }
+                    currentFilteredList.contains("item sum") -> {
+                        isShowInputField.value = true
+                        filteredListItemDb.value = listBarnItemDB.filter { barnItemDB ->
+                            barnItemDB.name == enteredName.value
+                        }
+                        val data = viewModel.getAllListWithSum(filteredListItemDb.value)
+                        if(data!=0.0f){
+                            map.value.put("${enteredName.value} sum", data)
+                        }
 
-              //  if (currentFilteredList.size != 0) {
-                    for (i in lisatOfFilters) {
-                        if (map.value.keys.contains(i))
-                            Text(text = "$i : ${map.value.get(i)}")
-                    }
-              //  }
-                LazyColumn {
-                    items(items = filteredListItemDb.value) {
-                        NoteRow(
-                            onNoteClicked = {
-
-                            },
-                            name = it.name,
-                            count = it.count.toString(),
-                            price = it.price.toString(),
-                            listName = it.listName,
-                        )
                     }
                 }
+                //   else -> {}
+            }
 
+            //  if (currentFilteredList.size != 0) {
+//                    for (i in lisatOfFilters) {
+//                        if (map.value.keys.contains(i))
+//                            Text(text = "$i : ${map.value.get(i)}")
+//                    }
+//                if (map.value.contains("sum from ${mDateBegin.value} till ${mDateLast.value}")){
+//                    val value="sum from ${mDateBegin.value} till ${mDateLast.value}"
+//                    Text(text = "$value : ${map.value.get(value)}")
+//                }
+            for (key in map.value.keys) {
+                Text(text = "$key : ${map.value.get(key)}")
+            }
+            //  }
+            LazyColumn {
+                items(items = filteredListItemDb.value) {
+                    NoteRow(
+                        onNoteClicked = {
 
+                        },
+                        name = it.name,
+                        count = it.count.toString(),
+                        price = it.price.toString(),
+                        listName = it.listName,
+                    )
+                }
             }
 
 
         }
 
-    }
 
+    }
 
 }
 
+
 @Composable
-fun MyCalendar(a:MutableState<String>,b:MutableState<String>) {
+fun MyCalendar(a: MutableState<String>, b: MutableState<String>) {
     val mContext = LocalContext.current
 
     // Declaring integer values
@@ -295,21 +360,25 @@ fun MyCalendar(a:MutableState<String>,b:MutableState<String>) {
         Button(onClick = {
 
             when (isFirst.value) {
-               true -> {
+                true -> {
+
+                    a.value = "00.00.0000"
+                    b.value = "00.00.0000"
                     mDatePickerDialog.show()
-isFirst.value=!isFirst.value
+                    isFirst.value = !isFirst.value
                 }
-               else -> {
+                else -> {
+                    b.value = "00.00.0000"
                     mDatePickerDialog2.show()
-                   isFirst.value=!isFirst.value
+                    isFirst.value = !isFirst.value
                 }
 
             }
             // mDatePickerDialog.show()
         }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFF0F9D58))) {
-var text=""
+            var text = ""
             text = when (isFirst.value) {
-               true-> {
+                true -> {
                     "enter first date"
 
                 }
