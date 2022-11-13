@@ -14,6 +14,11 @@ data class NameBarnItemList(
     var name:String = "",
     val createdTime:String =""
 ) {
+
+    companion object{
+    const val UNDEFINED_ID= 0
+}
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -27,11 +32,7 @@ data class NameBarnItemList(
 
     override fun hashCode(): Int {
         return name.hashCode()
-
     }
-companion object{
-    const val UNDEFINED_ID= 0
-}
 }
 
 

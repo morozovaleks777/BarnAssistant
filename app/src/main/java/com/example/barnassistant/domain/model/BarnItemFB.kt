@@ -5,16 +5,17 @@ import com.google.firebase.firestore.PropertyName
 
 data class BarnItemFB(
     @Exclude var id: String? = null,
-    var itemId: Int = UNDEFINED_ID,
-    @get:PropertyName("name")
-    @set:PropertyName("name")
-    var name:String="",
-    var count: Float,
-    var price:Float=0.0F,
-    var enabled:Boolean,
-    var listName:String,
-    var time:String=""
+    var itemId:Int?=null,
+    val name:String?=null,
+    var count: Float?=null,
+    var price:Float?=null,
+    val enabled:Boolean?=null,
+    val listName:String?=null,
+    val time:String?=null,
+    var isInFirebase:Boolean?=null
 ){
+
+
     companion object{
         const val UNDEFINED_ID=0
     }

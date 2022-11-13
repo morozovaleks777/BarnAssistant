@@ -34,7 +34,7 @@ import com.example.barnassistant.domain.model.NameBarnItemList
 //    }
 //}
 
-@Database(entities = [BarnItemDB::class,NameBarnItemList::class],version = 9,exportSchema = false)
+@Database(entities = [BarnItemDB::class,NameBarnItemList::class],version = 10,exportSchema = false)
 abstract class AppRoomDatabase:RoomDatabase() {
     abstract fun barnListDao():RoomDao
 }

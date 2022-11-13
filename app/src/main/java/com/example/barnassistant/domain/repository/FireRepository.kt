@@ -3,21 +3,23 @@ package com.example.barnassistant.domain.repository
 
 import com.example.barnassistant.data.DataOrException
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.model.BarnItemFB
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FireRepository @Inject constructor(
-    private val queryBook: Query
+    private val queryItem: Query
     ) {
-    suspend fun getAllBooksFromDatabase(): DataOrException<List<BarnItemDB>, Boolean, Exception> {
-        val dataOrException = DataOrException<List<BarnItemDB>, Boolean, Exception>()
+    val dataOrException = DataOrException<List<BarnItemFB>, Boolean, Exception>()
+    suspend fun getAllItemsFromDatabase(): DataOrException<List<BarnItemFB>, Boolean, Exception> {
+        val dataOrException = DataOrException<List<BarnItemFB>, Boolean, Exception>()
 
         try {
             dataOrException.loading = true
-            dataOrException.data =  queryBook.get().await().documents.map { documentSnapshot ->
-                documentSnapshot.toObject(BarnItemDB::class.java)!!
+            dataOrException.data =  queryItem.get().await().documents.map { documentSnapshot ->
+                documentSnapshot.toObject(BarnItemFB::class.java)!!
             }
             if (!dataOrException.data.isNullOrEmpty()) dataOrException.loading = false
 
@@ -28,6 +30,7 @@ class FireRepository @Inject constructor(
         return dataOrException
 
     }
+
 
 
 

@@ -28,10 +28,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -49,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -56,6 +60,7 @@ import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
+
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -959,3 +964,29 @@ border = BorderStroke(width = 1.dp,color= Color.Black.copy(alpha = 0.6f)),
 
 
 
+//@Composable
+//fun AdvertView(modifier: Modifier = Modifier) {
+//    val isInEditMode = LocalInspectionMode.current
+//    if (isInEditMode) {
+//        Text(
+//            modifier = modifier
+//                .fillMaxWidth()
+//                .background(Red)
+//                .padding(horizontal = 2.dp, vertical = 6.dp),
+//            textAlign = TextAlign.Center,
+//            color = White,
+//            text = "Advert Here",
+//        )
+//    } else {
+//        AndroidView(
+//            modifier = modifier.fillMaxWidth(),
+//            factory = { context ->
+//                AdView(context).apply {
+//                 // this. adSize = AdSize.BANNER
+//                    adUnitId = context.getString(R.string.ad_id_banner_start)
+//                    loadAd(AdRequest.Builder().build())
+//                }
+//            }
+//        )
+//    }
+//}

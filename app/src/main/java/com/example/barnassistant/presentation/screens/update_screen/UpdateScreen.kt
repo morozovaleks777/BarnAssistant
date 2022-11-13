@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.barnassistant.domain.model.BarnItem
 import com.example.barnassistant.domain.model.BarnItemDB
@@ -32,10 +33,10 @@ import kotlinx.coroutines.flow.collect
 @ExperimentalMaterialApi
 @Composable
 fun UpdateScreen(navController: NavController,
-homeViewModel: HomeScreenViewModel,
-detailHViewModel: BarnItemViewModel,
+                 homeViewModel: HomeScreenViewModel,
+                 detailHViewModel: BarnItemViewModel= hiltViewModel(),
                  curName:String="",
-updateScreenViewModel: UpdateScreenViewModel){
+                 updateScreenViewModel: UpdateScreenViewModel){
     val listName = rememberSaveable { mutableStateOf(curName) }
     val name = rememberSaveable { mutableStateOf("") }
     val count = rememberSaveable { mutableStateOf("") }
@@ -44,7 +45,7 @@ updateScreenViewModel: UpdateScreenViewModel){
     val sum= rememberSaveable { mutableStateOf(0f) }
 
 
-    val listBarnItemDB = detailHViewModel.favList.collectAsState().value.filter {
+    val listBarnItemDB = detailHViewModel._roomBarnList.collectAsState().value.filter {
        homeViewModel.getNameBarnItemListFromName(it.listName)
 
         it.listName == curName

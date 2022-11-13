@@ -1,6 +1,8 @@
 package com.example.barnassistant.presentation.screens.detail
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,13 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.barnassistant.R
+import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.domain.model.BarnItem
+import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.domain.model.BarnItemFB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.components.InputField
 import com.example.barnassistant.presentation.components.LazyColumnBarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -47,10 +54,12 @@ fun DetailBarnListScreen(
     val price = rememberSaveable { mutableStateOf("") }
     val itemId = rememberSaveable { mutableStateOf(0) }
     val list = mutableListOf<BarnItem>()
+    val myList=viewModel.favList.collectAsState().value
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             BarnAppBar(
-                title = "Create new Barn list",
+                title ="Create new Barn list",
                 icon = Icons.Default.ArrowBack,
                 navController = navController,
                 showProfile = false
@@ -62,6 +71,7 @@ fun DetailBarnListScreen(
     ) {
         Surface(modifier = Modifier.padding(it)) {
             Column {
+
                 EditForm(
                     homeViewModel,
                     itemId,
@@ -81,7 +91,7 @@ fun DetailBarnListScreen(
                 }
                 Spacer(modifier = Modifier.height(13.dp))
 
-                val listBarnItemDB = viewModel.favList.collectAsState().value.filter {
+                val listBarnItemDB = viewModel._roomBarnList.collectAsState().value.filter {
                     it.listName == listName.value
                 }
 
@@ -99,6 +109,66 @@ fun DetailBarnListScreen(
             }
         }
     }
+
+//    fun  saveToFirebase(
+//        listData:List<BarnItemDB>,
+//        data: BarnItemFB,
+//        // navController: NavController,
+//        context: Context,
+//        isList: Boolean
+//    ) {
+//        val barnListMapper=BarnListMapper()
+//        Log.d("save", "saveToFirebase: працює")
+//        val list= mutableListOf<BarnItemFB>()
+//        for(item in listData){
+//            list.add(barnListMapper.mapBarnDBToBarnItemFB(item))
+//        }
+//        val db = FirebaseFirestore.getInstance()
+//        val dbCollection = db.collection("books")
+//        when  {
+//            isList ->
+//                for (i in list.indices)
+//                // if (data.toString().isNotEmpty()) {
+//
+//                    dbCollection.add(list[i])
+//                        .addOnSuccessListener { documentRef ->
+//                            val docId = documentRef.id
+//                            dbCollection.document(docId)
+//                                .update(hashMapOf("id" to docId) as Map<String, Any>)
+//                                .addOnCompleteListener { task ->
+//                                    if (task.isSuccessful) {
+//                                        // navController.popBackStack()
+//                                        Toast.makeText(context,"saved", Toast.LENGTH_SHORT).show()
+//                                    }
+//                                }.addOnFailureListener {
+//                                    Log.w("Error", "SaveToFirebase:  Error updating doc",it )
+//                                }
+//                        }
+//            //   }else { Toast.makeText(context,"not saved", Toast.LENGTH_SHORT).show() }
+//
+//            !isList -> {
+//
+//                if (data.toString().isNotEmpty()) {
+//                    dbCollection.add(data)
+//                        .addOnSuccessListener { documentRef ->
+//                            val docId = documentRef.id
+//                            dbCollection.document(docId)
+//                                .update(hashMapOf("id" to docId) as Map<String, Any>)
+//                                .addOnCompleteListener { task ->
+//                                    if (task.isSuccessful) {
+//                                        // navController.popBackStack()
+//                                        Toast.makeText(context,"saved", Toast.LENGTH_SHORT).show()
+//                                        Log.d("save", "saveToFirebase: save")
+//                                    }
+//                                }.addOnFailureListener {
+//                                    Log.w("Error", "SaveToFirebase:  Error updating doc",it )
+//                                }
+//                        }
+//                }else { Toast.makeText(context,"not saved", Toast.LENGTH_SHORT).show() }
+//            }
+//            else -> {}
+//        }
+//    }
 }
 
 //@ExperimentalMate"rialApi
@@ -317,7 +387,8 @@ fun EditForm(
                     list.add(
                         BarnItem(
                             name = name.value, count = count.value.toFloat(),
-                            price = price.value.toFloat(), enabled = true, listName = listName.value
+                            price = price.value.toFloat(), enabled = true, listName = listName.value,
+                            isInFirebase = false
                         )
                     )
                     viewModel.addBarnItem(
@@ -329,11 +400,12 @@ fun EditForm(
                     homeViewModel.getTime()
                     time.value=homeViewModel.time.value
                     Log.d("test", "EditForm: after ${time.value}")
-                    if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value, createdTime = "${time.value}"))) {
+                    if(!homeViewModel._nameList.value.contains(NameBarnItemList(name = listName.value,
+                            createdTime = time.value))) {
                         homeViewModel.addNameBarnItemList(
                             NameBarnItemList(
                                 name = listName.value,
-                                createdTime = "${time.value}"
+                                createdTime = time.value
                             )
                         )
                         Log.d("test", "EditForm: $list")
@@ -385,3 +457,4 @@ fun CreateButton(
         else Text(text = textId, modifier = Modifier.padding(5.dp))
     }
 }
+

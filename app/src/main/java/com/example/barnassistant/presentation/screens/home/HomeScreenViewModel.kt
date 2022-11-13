@@ -1,43 +1,42 @@
 package com.example.barnassistant.presentation.screens.home
+
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.data.DataOrException
+import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
 import com.example.barnassistant.domain.repository.RoomRepository
 import com.example.barnassistant.domain.useCases.GetBarnListUseCase
 import com.example.barnassistant.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor (
     private val repository: RoomRepository,
-    getBarnListUseCase: GetBarnListUseCase,
+    val getBarnListUseCase: GetBarnListUseCase,
     private  val utils: Utils,
     val mapper: BarnListMapper
 ): ViewModel() {
     var data: MutableState<DataOrException<List<NameBarnItemList>, Boolean, Exception>> =
         mutableStateOf(DataOrException(listOf(), true, Exception("")))
 
-    val listBarn =getBarnListUseCase.getBarnList()
+    val listBarn =MutableStateFlow<List<BarnItemDB>>(emptyList())
     val listName = repository.getList()
     val _nameList = MutableStateFlow<List<NameBarnItemList>>(listOf()) //emptyList()
     val barnItemNameList = MutableStateFlow(NameBarnItemList())
 
 
     init {
+
         Log.d("viewModel", ":${this.hashCode()} ")
         getAllBooksFromDatabase()
     }
@@ -51,6 +50,20 @@ class HomeScreenViewModel @Inject constructor (
 
     }
 
+    fun getBarnItemList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getBarnListUseCase.getBarnList().distinctUntilChanged()
+                .collect() { listOfFavs ->
+                    if (listOfFavs.isNullOrEmpty()) {
+                        Log.d("test", ": is empty ")
+                    } else {
+                       listBarn.value = listOfFavs
+
+                    }
+                }
+
+        }
+    }
 
     fun getAllBooksFromDatabase() {
 
@@ -58,7 +71,9 @@ class HomeScreenViewModel @Inject constructor (
             repository.getList().distinctUntilChanged()
                 .collect {
                         listOfFavs ->
-                    _nameList.value = listOfFavs
+                val   newlistOfFavs=listOfFavs.toSet()
+
+                    _nameList.value = newlistOfFavs .toList()
                     Log.d("test", " list of names: ${_nameList.value} ")
                 }
             data.value.loading = true
@@ -85,7 +100,8 @@ class HomeScreenViewModel @Inject constructor (
     fun addNameBarnItemList(nameBarnItemList: NameBarnItemList) {
         viewModelScope.launch {
             repository.getCurrentTime()
-            if(!_nameList.value.isNullOrEmpty() && !_nameList.value.contains(nameBarnItemList)||barnItemNameList.value.name=="" )
+            val filterNameList=_nameList.value.filter {nameBarnItemList ->nameBarnItemList.name==nameBarnItemList.name   }
+            if(!_nameList.value.isNullOrEmpty() && !_nameList.value.contains(nameBarnItemList)&&filterNameList.isEmpty()||barnItemNameList.value.name=="" )
             {
                 repository.addName(nameBarnItemList)
                 Log.d("test", "addNameBarnItemList: ${_nameList.value}")
@@ -104,8 +120,11 @@ class HomeScreenViewModel @Inject constructor (
             getAllBooksFromDatabase()
             if(!_nameList.value.isNullOrEmpty() || barnItemNameList.value!=null|| _nameList.value.size!=1 ){
 
-                getAllBooksFromDatabase()
+               // getAllBooksFromDatabase()
+                val filteredBarnList=listBarn.value.filter { barnItemDB -> barnItemDB.listName==nameBarnItemList.name }
             repository.deleteNameBarnItem(barnItemNameList.value)
+                for(item in filteredBarnList){
+                repository.deleteBarnItem(mapper.mapBarnDBToBarnItem(item))}
 
 
               }

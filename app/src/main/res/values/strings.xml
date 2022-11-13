@@ -4,4 +4,5 @@
     <string name="action"> This action is not reversible</string>
     <string name="create_acct"> Please enter a valid email and password that is at least 6 characters</string>
     <string name="cd_button_send">Send</string>
+    <string name="ad_id_banner_start">ca-app-pub-1381732058097117/7250865750</string>
 </resources>

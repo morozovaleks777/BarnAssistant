@@ -26,6 +26,7 @@ import com.example.barnassistant.presentation.screens.message_list_screen.Messag
 import com.example.barnassistant.presentation.screens.splash.SplashScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreen
 import com.example.barnassistant.presentation.screens.update_screen.UpdateScreenViewModel
+import com.google.api.Context
 import io.getstream.chat.android.client.ChatClient
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
@@ -48,6 +49,7 @@ fun AppNavigation() {
             LoginScreen(navController = navController)
         }
         composable(AppScreens.HelpScreen.name) {
+
             HelpScreen(navController = navController)
         }
         composable(AppScreens.Counter.name) {

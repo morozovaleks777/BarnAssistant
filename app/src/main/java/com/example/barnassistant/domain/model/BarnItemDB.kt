@@ -21,7 +21,9 @@ data class BarnItemDB (
     @ColumnInfo(name = "listName")
     val listName:String="",
     @ColumnInfo(name = "time")
-    val time:String = ""
+    var time:String = "",
+    @ColumnInfo(name = "isInFirebase")
+    val isInFirebase:Boolean=false
 
 ){
     companion object{
