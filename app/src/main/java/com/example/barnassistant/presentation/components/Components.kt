@@ -60,6 +60,11 @@ import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+
+import com.google.android.gms.ads.AdView
+
 
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -963,30 +968,57 @@ border = BorderStroke(width = 1.dp,color= Color.Black.copy(alpha = 0.6f)),
             }
 
 
-
-//@Composable
-//fun AdvertView(modifier: Modifier = Modifier) {
-//    val isInEditMode = LocalInspectionMode.current
-//    if (isInEditMode) {
-//        Text(
-//            modifier = modifier
-//                .fillMaxWidth()
-//                .background(Red)
-//                .padding(horizontal = 2.dp, vertical = 6.dp),
-//            textAlign = TextAlign.Center,
-//            color = White,
-//            text = "Advert Here",
-//        )
-//    } else {
-//        AndroidView(
-//            modifier = modifier.fillMaxWidth(),
-//            factory = { context ->
-//                AdView(context).apply {
-//                 // this. adSize = AdSize.BANNER
-//                    adUnitId = context.getString(R.string.ad_id_banner_start)
-//                    loadAd(AdRequest.Builder().build())
-//                }
-//            }
-//        )
-//    }
-//}
+@Preview
+@Composable
+fun AdvertView(modifier: Modifier = Modifier) {
+    val isInEditMode = LocalInspectionMode.current
+    if (isInEditMode) {
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(Red)
+                .padding(horizontal = 2.dp, vertical = 6.dp),
+            textAlign = TextAlign.Center,
+            color = White,
+            text = "Advert Here",
+        )
+    } else {
+        AndroidView(
+            modifier = modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+               setAdSize(AdSize.BANNER)
+                    adUnitId = context.getString(R.string.ad_id_banner_start)
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
+    }
+}
+@Preview
+@Composable
+fun AdvertView2(modifier: Modifier = Modifier) {
+    val isInEditMode = LocalInspectionMode.current
+    if (isInEditMode) {
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(Red)
+                .padding(horizontal = 2.dp, vertical = 6.dp),
+            textAlign = TextAlign.Center,
+            color = White,
+            text = "Advert Here",
+        )
+    } else {
+        AndroidView(
+            modifier = modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize( AdSize.BANNER)
+                    adUnitId = context.getString(R.string.ad_id_banner2)
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
+    }
+}

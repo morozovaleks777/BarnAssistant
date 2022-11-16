@@ -25,9 +25,9 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-<!--        <meta-data-->
-<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-<!--            android:value="ca-app-pub-1381732058097117~4367829343" />-->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

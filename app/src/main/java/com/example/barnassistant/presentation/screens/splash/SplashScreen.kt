@@ -23,6 +23,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.barnassistant.R
+import com.example.barnassistant.presentation.components.AdvertView
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
@@ -101,7 +102,8 @@ fun SplashScreen(navController: NavController){
             Modifier.padding(1.dp), verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-          //  ReaderLogo()
+
+
             Animat(navController)
             Spacer(modifier = Modifier.height(15.dp))
             Text(

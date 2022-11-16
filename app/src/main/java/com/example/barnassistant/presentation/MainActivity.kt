@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import com.example.barnassistant.MyReceiver
 import com.example.barnassistant.R
+import com.example.barnassistant.presentation.components.AdvertView
 import com.example.barnassistant.presentation.navigation.AppNavigation
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
@@ -59,6 +60,7 @@ private lateinit var homeViewModel:HomeScreenViewModel
         setContent {
             BarnAssistantTheme {
                 Column {
+
                     BarnAssistantApp()
 
                 }

@@ -23,12 +23,15 @@ import com.example.barnassistant.data.BarnListMapper
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.BarnItemFB
 import com.example.barnassistant.domain.model.NameBarnItemList
+import com.example.barnassistant.presentation.components.AdvertView
+import com.example.barnassistant.presentation.components.AdvertView2
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import com.example.barnassistant.utils.WorkerKeys
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.android.gms.ads.AdSize
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -244,5 +247,9 @@ if(list[i].enabled==false && list[i].isInFirebase == false){
             WorkInfo.State.BLOCKED -> Text("Download blocked")
             else -> {}
         }
+        Box( modifier = Modifier.padding(bottom = 15.dp).height(150.dp)){
+            AdvertView2()
+        }
+
     }
 }

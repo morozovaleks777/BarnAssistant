@@ -22,6 +22,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
 import com.example.barnassistant.R
 import com.example.barnassistant.domain.model.BarnItemDB
+import com.example.barnassistant.presentation.components.AdvertView
+import com.example.barnassistant.presentation.components.AdvertView2
 import com.example.barnassistant.presentation.components.BarnAppBar
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.CreateButton
@@ -117,6 +119,9 @@ client: ChatClient,
                 BarnAppBar(title ="chatik huyatik" , navController =navController,
                     showProfile = false ,icon = Icons.Default.ArrowBack,){
                     navController.navigate(AppScreens.HomeScreen.name)
+                }
+                Box{
+                    AdvertView2()
                 }
                 com.example.barnassistant.presentation.components.InputField(valueState = userName,
                     labelId = "enter  name",
@@ -257,6 +262,8 @@ client: ChatClient,
                     },
                     onBackPressed = { navController.navigate(AppScreens.HomeScreen.name) }
                 )
+
+
             }
         }
     }

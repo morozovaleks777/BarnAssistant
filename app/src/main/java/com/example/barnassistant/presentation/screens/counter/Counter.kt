@@ -35,9 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.barnassistant.domain.model.BarnItemDB
 import com.example.barnassistant.domain.model.NameBarnItemList
-import com.example.barnassistant.presentation.components.BarnAppBar
-import com.example.barnassistant.presentation.components.FilterCard
-import com.example.barnassistant.presentation.components.NoteRow
+import com.example.barnassistant.presentation.components.*
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import java.util.*
 
@@ -286,7 +284,7 @@ fun Counter(
                 Text(text = "$key : ${map.value.get(key)}")
             }
             //  }
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxHeight(0.75f)) {
                 items(items = filteredListItemDb.value) {
                     NoteRow(
                         onNoteClicked = {
@@ -299,6 +297,10 @@ fun Counter(
                     )
                 }
             }
+Box(modifier = Modifier.padding(7.dp)){
+    AdvertView2()
+}
+
 
 
         }

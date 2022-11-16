@@ -181,6 +181,9 @@ fun HomeContent(
             }
         }
 
+
+
+
         LastOpenedListArea(
             time = time.value,
             listOfBooks = filteredListOfNameBarnItemList.value,
@@ -197,6 +200,7 @@ fun HomeContent(
             homeViewModel = viewModel
         )
         TitleSection(label = "Previous  Lists", modifier = Modifier.heightIn(30.dp))
+        AdvertView2()
 
         if (nameOfList != null) {
             OllListArea(

@@ -25,7 +25,7 @@ import com.example.barnassistant.presentation.components.FABContent
 import com.example.barnassistant.presentation.components.LazyColumnBarnItemDB
 import com.example.barnassistant.presentation.navigation.AppScreens
 import com.example.barnassistant.presentation.screens.detail.BarnItemViewModel
-import com.example.barnassistant.presentation.screens.home.HomeContent
+//import com.example.barnassistant.presentation.screens.home.HomeContent
 import com.example.barnassistant.presentation.screens.home.HomeScreenViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
